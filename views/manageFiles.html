@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookVerse - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Page Background & Fonts */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* Top Navbar: three sections with fixed left/right widths */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1876db;
+      padding: 10px 20px;
+      color: white;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .nav-left, .nav-right {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-center {
+      flex: 1;
+      text-align: center;
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      color: #f7f1f1;
+      letter-spacing: 1px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    /* Small round profile pic in navbar (nav-left) */
+    .nav-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .nav-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Right arrow button in navbar (nav-right) */
+    .nav-arrow {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: white;
+      color: #1876db;
+      display: none; /* hidden by default */
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    .nav-arrow.visible {
+      display: flex;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #0056b3;
+      padding: 20px;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    /* Sidebar Header: Big profile pic & admin name */
+    .sidebar .sidebar-header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .sidebar-header .big-profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 10px;
+    }
+    .sidebar .sidebar-header .big-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sidebar .sidebar-header h2 {
+      color: white;
+      font-size: 20px;
+      margin: 0;
+    }
+    /* Sidebar Close Arrow positioned at top right of sidebar */
+    .sidebar .sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: white;
+      color: #0056b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    /* Sidebar navigation tabs */
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .sidebar ul li {
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.5s ease, transform 0.3s ease;
+    }
+    .sidebar ul li:hover {
+      background: #004494;
+      transform: translateX(10px);
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+    /* Main Dashboard Content */
+    .dashboard {
+      margin-top: 80px; /* space for navbar */
+      padding: 20px;
+      transition: margin-left 0.5s ease;
+      margin-left: 20px;
+    }
+    .dashboard.shifted {
+      margin-left: 270px; /* sidebar width (250px) + gap (20px) */
+    }
+    /* Data Card styling */
+    .cards-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .data-card {
+      background-color: white;
+      padding: 50px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.5s ease, background 0.3s ease, color 0.3s ease;
+      text-align: center;
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .data-card i {
+      font-size: 90px;
+      transition: color 0.3s ease;
+    }
+    .data-card:hover {
+      transform: scale(1.05);
+      background-color: #007bff;
+      color: white;
+    }
+    .data-card:hover i {
+      color: white;
+    }
+    /* Search bar styling */
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .search-input {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px 15px;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+    .search-input:focus {
+      box-shadow: 0 0 10px rgba(24, 118, 219, 0.5);
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .file-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .file-card:hover {
+      transform: translateY(-5px);
+    }
+    .file-card img {
+      width: 60px;
+      margin-bottom: 10px;
+    }
+    .file-card h3 {
+      margin: 10px 0 5px;
+      font-size: 20px;
+    }
+    .file-card p {
+      margin: 5px 0;
+      color: #555;
+      font-size: 14px;
+    }
+    .file-card .action-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    .file-card .approve-btn {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .file-card .reject-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .file-card .download-btn {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .file-card .download-btn i {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+   <!-- Top Navigation Bar -->
+   <nav class="top-nav">
+    <!-- Left: Small round profile pic -->
+    <div class="nav-profile" id="navProfile" onclick="openSidebar()">
+      <img id="smallPic" src="/user.jpg" alt="Admin Profile">
+    </div>
+    <h1 class="brand-name">BookVerse - Manage Files</h1>
+    <!-- Right side: Logout button will be implemented here in upcoming codes -->
+    <div class="nav-right"></div>
+  </nav>
+
+  <!-- Sidebar (overlays the navbar when open) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <!-- Close button at top right of sidebar -->
+      <div class="sidebar-close" id="sidebarClose" onclick="closeSidebar()">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <!-- Big admin profile picture -->
+      <div class="big-profile">
+        <img id="bigprofile" src="/uploads/profile_pics/admin_big.jpg" alt="Admin Profile">
+      </div>
+      <!-- Admin Name -->
+      <h2 id="adminName">Admin Name</h2>
+    </div>
+    <ul>
+      <li onclick="navigateTo('admin-dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="navigateTo('manageUsers')"><i class="fas fa-users"></i> Manage Users</li>
+      <li onclick="navigateTo('manageBooks')"><i class="fas fa-book"></i> Manage Books</li>
+      <li onclick="navigateTo('manageFiles')"><i class="fas fa-file"></i> Manage Files</li>
+      <li onclick="navigateTo('adminProfile')"><i class="fas fa-user"></i> Profile</li>
+      <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+  <div class="main-container">
+    <h2>Manage Files</h2>
+    <!-- Search bar -->
+    <div class="search-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by file name, department, or semester..." />
+    </div>
+    <div class="cards-grid" id="filesContainer">
+      <!-- File cards will be dynamically inserted here -->
+    </div>
+  </div>
+  <script>
+    
+    // Get current user email from URL (if applicable)
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+
+    // Open Sidebar: show sidebar, hide small nav-profile, shift main content, reset arrow rotation
+   function openSidebar() {
+      document.getElementById('sidebar').classList.add('active');
+      document.getElementById('navProfile').style.display = 'block';
+      document.getElementById('dashboardContent').classList.add('shifted');
+      document.getElementById('sidebarClose').style.transform = 'rotate(0deg)';
+    }
+
+    // Close Sidebar: hide sidebar, show small nav-profile, unshift main content, rotate arrow counterclockwise
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('navProfile').style.display = 'block';
+      document.getElementById('dashboardContent').classList.remove('shifted');
+      document.getElementById('sidebarClose').style.transform = 'rotate(-180deg)';
+    }
+
+    
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+      // The main-container adjusts automatically via CSS sibling selector.
+    }
+    function logout() {
+      window.location.href = '/logout';
+    }
+    function navigateTo(page) {
+      const query = currentUserEmail ? `?email=${encodeURIComponent(currentUserEmail)}` : '';
+      window.location.href = `/${page}${query}`;
+    }
+
+    // Global variable to store fetched file data for filtering.
+    let allFiles = [];
+
+    // Fetch pending files and populate cards
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/admin/manageFiles')
+        .then(response => response.json())
+        .then(data => {
+          allFiles = data;
+          renderCards(data);
+        })
+        .catch(err => console.error('Error fetching pending files:', err));
+
+      // Add event listener for search input
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        const filtered = allFiles.filter(file => {
+          // Check if any field contains the query string
+          return (
+            (file.file_name && file.file_name.toLowerCase().includes(query)) ||
+            (file.department && file.department.toLowerCase().includes(query)) ||
+            (file.semester && String(file.semester).toLowerCase().includes(query))
+          );
+        });
+        renderCards(filtered);
+      });
+    });
+
+    // Function to render file cards from provided data
+    function renderCards(data) {
+      const container = document.getElementById('filesContainer');
+      container.innerHTML = "";
+      data.forEach(file => {
+        // Determine file icon based on extension
+        let sampleCover = 'file.png';
+        const ext = file.file_name.split('.').pop().toLowerCase();
+        switch(ext) {
+          case 'pdf':
+            sampleCover = 'pdf.png';
+            break;
+          case 'doc':
+          case 'txt':
+          case 'docx':
+            sampleCover = 'txt.png';
+            break;
+          case 'ppt':
+          case 'pptx':
+            sampleCover = 'ppt.png';
+            break;
+          default:
+            sampleCover = 'file.png';
+        }
+        container.innerHTML += `
+          <div class="file-card">
+            <img src="${sampleCover}" alt="File Icon">
+            <p><strong>File Name:</strong> ${file.file_name}</p>
+            <p><strong>Uploader:</strong> ${file.uploader_name || 'N/A'}</p>
+            <p><strong>Department:</strong> ${file.department || 'N/A'}</p>
+            <p><strong>Semester:</strong> ${file.semester || 'N/A'}</p>
+            <div>
+              <button class="action-btn reject-btn" onclick="rejectFile(${file.id})">Remove</button>
+              <button class="action-btn download-btn" onclick="downloadFile(${file.id})"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Reject file: remove the file entry
+    function rejectFile(id) {
+      if (confirm('Are you sure you want to reject this file?')) {
+        fetch(`/admin/rejectFile?id=${id}`, { method: 'POST' })
+          .then(response => response.json())
+          .then(() => location.reload())
+          .catch(err => console.error('Error rejecting file:', err));
+      }
+    }
+    // Download file: trigger download endpoint
+    function downloadFile(id) {
+      window.location.href = `/admin/downloadFile?id=${id}`;
+    }
+     // On page load: fetch admin details from server and update profile elements
+     document.addEventListener("DOMContentLoaded", function() {
+      console.log("Page loaded, starting admin data fetch...");
+      if (!currentUserEmail) {
+        console.error("No email in URL!");
+        return;
+      }
+      console.log("Fetching data for email:", currentUserEmail);
+
+      fetch(`/admin/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(res => {
+          console.log("Response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Server responded with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Received admin data:", data);
+          // Determine profile picture URL; fallback to default if not set
+          const picUrl = data.profile_picture
+            ? `/uploads/profile_pics/${data.profile_picture}`
+            : '/default-profile.png';
+
+          // Update profile images (make sure elements exist)
+          const smallPic = document.getElementById("smallPic");
+          const bigprofile = document.getElementById("bigprofile");
+          const mainProfilePic = document.getElementById("mainProfilePic");
+          const profilePicPreview = document.getElementById("profilePicPreview");
+
+          if (smallPic) smallPic.src = picUrl;
+          if (bigprofile) bigprofile.src = picUrl;
+          if (mainProfilePic) mainProfilePic.src = picUrl;
+          if (profilePicPreview) profilePicPreview.src = picUrl;
+
+          // Update text fields
+          const userNameHeader = document.getElementById("userNameHeader");
+          const profileName = document.getElementById("profileName");
+          const profileEmail = document.getElementById("profileEmail");
+          const profileDepartment = document.getElementById("profileDepartment");
+          const profilePhone = document.getElementById("profilePhone");
+          const adminName = document.getElementById("adminName"); // Sidebar admin name
+
+          if (userNameHeader) userNameHeader.textContent = data.full_name || "Admin";
+          if (profileName) profileName.textContent = data.full_name || "Admin";
+          if (profileEmail) profileEmail.textContent = data.email || "N/A";
+          if (profileDepartment) profileDepartment.textContent = data.department || "N/A";
+          if (profilePhone) profilePhone.textContent = data.phone || "N/A";
+          if (adminName) adminName.textContent = data.full_name || "Admin";
+        })
+        .catch(err => {
+          console.error("Error fetching admin info:", err);
+          const errorElement = document.getElementById("error-message");
+          if (errorElement) {
+            errorElement.textContent = "Failed to load admin information. Please try again.";
+          }
+        });
+    });
+  </script>
+</body>
+</html>

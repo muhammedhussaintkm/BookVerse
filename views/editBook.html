@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Book - BookVerse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    /* Global Reset and Fonts */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?fm=jpg&q=80&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.97);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      max-width: 800px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    /* Layout for the form fields (two columns) */
+    .form-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .form-row label {
+      flex: 0 0 150px;
+      font-size: 16px;
+      color: #333;
+      padding-right: 10px;
+    }
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .form-row textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    /* Cover image card styling */
+    .cover-upload {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 20px;
+      width: 150px;
+      height: 200px;
+      transition: background 0.3s ease;
+    }
+    .cover-upload:hover {
+      background: #f0f0f0;
+    }
+    .cover-upload img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+    .cover-upload i {
+      font-size: 50px;
+      color: #007bff;
+    }
+    .cover-upload p {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+    /* Hidden file input */
+    .hidden-file {
+      display: none;
+    }
+    /* Container to hold the buttons side by side */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Submit button styling */
+.btn-submit {
+  padding: 10px 20px;
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Back button styling */
+.btn-back {
+  padding: 10px 20px;
+  background: #1876db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #007bb5;
+}
+
+.btn-back:hover {
+  background: #155dba;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Edit Book Details</h2>
+    <!-- Cover Upload Card -->
+    <div class="cover-upload" id="coverUploadCard" onclick="triggerFileInput()">
+      <i class="fas fa-plus"></i>
+      <p>Upload New Cover</p>
+    </div>
+ 
+    <!-- Edit Book Form -->
+    <form id="editBookForm" action="/updateBook" method="POST" enctype="multipart/form-data">
+      <!-- We'll include a hidden field for book id -->
+      <input type="hidden" name="id" id="bookId">
+         <!-- Hidden File Input -->
+    <input type="file" name="book_cover" id="book_cover" accept="image/*" class="hidden-file" onchange="previewCover(event)">
+      <div class="form-row">
+        <label for="book_name">Book Name:</label>
+        <input type="text" name="book_name" id="book_name" required>
+      </div>
+      <div class="form-row">
+        <label for="author">Author:</label>
+        <input type="text" name="author" id="author" required>
+      </div>
+      <div class="form-row">
+        <label for="edition">Edition:</label>
+        <input type="text" name="edition" id="edition">
+      </div>
+      <div class="form-row">
+        <label for="description">Description:</label>
+        <textarea name="description" id="description" placeholder="Enter description..."></textarea>
+      </div>
+      <div class="form-row">
+        <label for="condition">Condition:</label>
+        <select name="condition" id="condition" required>
+          <option value="">Select Condition</option>
+          <option value="new">New</option>
+          <option value="good">Good</option>
+          <option value="fair">Fair</option>
+          <option value="poor">Poor</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="semester">Semester:</label>
+        <select name="semester" id="semester" required>
+          <option value="">Select Semester</option>
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
+          <option value="3">Semester 3</option>
+          <option value="4">Semester 4</option>
+          <option value="5">Semester 5</option>
+          <option value="6">Semester 6</option>
+          <option value="7">Semester 7</option>
+          <option value="8">Semester 8</option>
+          <option value="All semester">Any Semester</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="department">Department:</label>
+        <select name="department" id="department" required>
+          <option value="">Select Department</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="EEE">EEE</option>
+          <option value="CE">CE</option>
+          <option value="All departments">Any Departments</option>
+        </select>
+      </div>
+      <div class="button-container">
+        <button type="submit" class="btn-submit" >Submit</button>
+        <button class="btn-back" onclick="goBack()">Back</button>
+      </div>
+      
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+  const bookId = urlParams.get('id');
+  const currentUserEmail = urlParams.get('email');
+  if (!bookId || !currentUserEmail) {
+    console.error("Missing id or email in URL");
+  }
+
+    // Helper: Get query parameter by name
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // On DOMContentLoaded, fetch current book details using the book id from URL
+    document.addEventListener('DOMContentLoaded', function() {
+      const bookId = getQueryParam('id');
+      const form = document.getElementById('editBookForm');
+  form.action = `/updateBook?id=${bookId}&email=${encodeURIComponent(currentUserEmail)}`;
+
+      if (!bookId) {
+        alert('No book id provided');
+        window.location.href = `/mybooks?email=${encodeURIComponent(currentUserEmail)}`;
+            
+      } else {
+        document.getElementById('bookId').value = bookId;
+        fetch(`/user/book?id=${bookId}`)
+          .then(response => response.json())
+          .then(data => {
+            // Populate the form fields with existing book details
+            document.getElementById('book_name').value = data.book_name || "";
+            document.getElementById('author').value = data.author || "";
+            document.getElementById('edition').value = data.edition || "";
+            document.getElementById('description').value = data.description || "";
+            document.getElementById('condition').value = data.conditions || "";
+            document.getElementById('semester').value = data.semester || "";
+            document.getElementById('department').value = data.department || "";
+            // Update cover upload card with current cover image if available
+            const coverCard = document.getElementById('coverUploadCard');
+            if (data.book_cover) {
+              coverCard.innerHTML = `<img src="/uploads/book_covers/${data.book_cover}" alt="Cover Image" style="width: 100%; height: auto; border-radius: 10px;">`;
+            }
+          })
+          .catch(err => console.error('Error fetching book details:', err));
+      }
+    });
+
+    // Trigger file input when cover upload card is clicked
+    function triggerFileInput() {
+      document.getElementById('book_cover').click();
+    }
+    function goBack() {
+  window.location.href =
+    `/mybookDetails?id=${bookId}&email=${encodeURIComponent(currentUserEmail)}`;
+}
+
+    // Preview the selected cover image
+    function previewCover(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const coverCard = document.getElementById('coverUploadCard');
+          coverCard.innerHTML = `<img src="${e.target.result}" alt="Cover Image" style="width: 100%; height: auto; border-radius: 10px;">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+</body>
+</html>

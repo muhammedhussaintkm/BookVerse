@@ -1,0 +1,131 @@
+
+
+mysql> use bookstoredb
+Database changed
+mysql> show tables;
++-----------------------+
+| Tables_in_bookstoredb |
++-----------------------+
+| admins                |
+| books                 |
+| buy_requests          |
+| files                 |
+| user_notification     |
+| users                 |
++-----------------------+
+6 rows in set (0.05 sec)
+
+mysql> desc admins;
++------------------+-------------------------------------+------+-----+---------+----------------+
+| Field            | Type                                | Null | Key | Default | Extra          |
++------------------+-------------------------------------+------+-----+---------+----------------+
+| id               | int                                 | NO   | PRI | NULL    | auto_increment |
+| email            | varchar(255)                        | NO   | UNI | NULL    |                |
+| full_name        | varchar(255)                        | NO   |     | NULL    |                |
+| password         | varchar(255)                        | NO   |     | NULL    |                |
+| resetToken       | varchar(255)                        | YES  |     | NULL    |                |
+| resetTokenExpiry | bigint                              | YES  |     | NULL    |                |
+| admin_status     | enum('pending','active','inactive') | YES  |     | pending |                |
+| role             | enum('superadmin','admin')          | YES  |     | admin   |                |
+| department       | varchar(255)                        | YES  |     | NULL    |                |
+| profile          | varchar(255)                        | YES  |     | NULL    |                |
+| phone            | varchar(10)                         | YES  |     | NULL    |                |
++------------------+-------------------------------------+------+-----+---------+----------------+
+11 rows in set (0.01 sec)
+
+mysql> desc books;
++------------------+----------------------------------------------------------------------------------------------------------+------+-----+-------------------+-------------------+
+| Field            | Type                                                                                                     | Null | Key | Default           | Extra             |
++------------------+----------------------------------------------------------------------------------------------------------+------+-----+-------------------+-------------------+
+| id               | int                                                                                                      | NO   | PRI | NULL              | auto_increment    |
+| uploader_id      | varchar(255)                                                                                             | YES  |     | NULL              |                   |
+| buyer_id         | varchar(255)                                                                                             | YES  |     | NULL              |                   |
+| confirm_buyer_id | varchar(255)                                                                                             | YES  |     | NULL              |                   |
+| book_name        | varchar(255)                                                                                             | NO   |     | NULL              |                   |
+| author           | varchar(255)                                                                                             | NO   |     | NULL              |                   |
+| edition          | varchar(255)                                                                                             | YES  |     | NULL              |                   |
+| description      | text                                                                                                     | YES  |     | NULL              |                   |
+| sell_price       | decimal(10,2)                                                                                            | YES  |     | NULL              |                   |
+| min_bid_price    | decimal(10,2)                                                                                            | YES  |     | NULL              |                   |
+| bid_period       | varchar(50)                                                                                              | YES  |     | NULL              |                   |
+| price            | decimal(10,2)                                                                                            | YES  |     | NULL              |                   |
+| conditions       | enum('new','good','fair','poor')                                                                         | NO   |     | NULL              |                   |
+| semester         | varchar(50)                                                                                              | YES  |     | NULL              |                   |
+| department       | varchar(50)                                                                                              | YES  |     | NULL              |                   |
+| book_cover       | varchar(255)                                                                                             | YES  |     | NULL              |                   |
+| status           | enum('sell_pending','auction_pending','enabled','disabled','sell_approved','auction_approved','library') | YES  |     | library           |                   |
+| type             | enum('sale','auction','library')                                                                         | YES  |     | library           |                   |
+| bid_start        | decimal(10,2)                                                                                            | YES  |     | NULL              |                   |
+| bid_end          | bigint                                                                                                   | YES  |     | NULL              |                   |
+| max_bid          | decimal(10,2)                                                                                            | YES  |     | NULL              |                   |
+| bid_status       | enum('open','closed')                                                                                    | YES  |     | open              |                   |
+| sale_status      | enum('open','closed')                                                                                    | YES  |     | open              |                   |
+| sell_status      | enum('open','closed')                                                                                    | YES  |     | open              |                   |
+| created_at       | timestamp                                                                                                | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| buyer_status     | enum('approved','pending')                                                                               | YES  |     | NULL              |                   |
+| approved_admin   | varchar(255)                                                                                             | YES  |     | NULL              |                   |
++------------------+----------------------------------------------------------------------------------------------------------+------+-----+-------------------+-------------------+
+27 rows in set (0.01 sec)
+
+mysql> desc buy_requests;
++--------------+----------------------------+------+-----+---------+----------------+
+| Field        | Type                       | Null | Key | Default | Extra          |
++--------------+----------------------------+------+-----+---------+----------------+
+| id           | int                        | NO   | PRI | NULL    | auto_increment |
+| book_id      | int                        | NO   | MUL | NULL    |                |
+| buyer_id     | varchar(100)               | NO   |     | NULL    |                |
+| buyer_status | enum('pending','approved') | YES  |     | pending |                |
++--------------+----------------------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc user_notification;
++-----------------------------+--------------+------+-----+-------------------+-------------------+
+| Field                       | Type         | Null | Key | Default           | Extra             |
++-----------------------------+--------------+------+-----+-------------------+-------------------+
+| id                          | int          | NO   | PRI | NULL              | auto_increment    |
+| user_email                  | varchar(100) | NO   |     | NULL              |                   |
+| notification                | text         | NO   |     | NULL              |                   |
+| notification_generated_time | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++-----------------------------+--------------+------+-----+-------------------+-------------------+
+4 rows in set (0.01 sec)
+
+mysql> desc files;
++---------------+------------------------------------------------------+------+-----+-------------------+-----------------------------------------------+
+| Field         | Type                                                 | Null | Key | Default           | Extra                                         |
++---------------+------------------------------------------------------+------+-----+-------------------+-----------------------------------------------+
+| id            | int                                                  | NO   | PRI | NULL              | auto_increment                                |
+| user_id       | varchar(255)                                         | YES  |     | NULL              |                                               |
+| file_name     | varchar(255)                                         | NO   |     | NULL              |                                               |
+| file_path     | varchar(255)                                         | NO   |     | NULL              |                                               |
+| description   | text                                                 | YES  |     | NULL              |                                               |
+| semester      | enum('1','2','3','4','5','6','7','8','Any semester') | YES  |     | Any semester      |                                               |
+| department    | enum('EEE','CSE','ECE','CE','Any department')        | YES  |     | Any department    |                                               |
+| status        | enum('pending','approved','rejected')                | YES  |     | pending           |                                               |
+| created_at    | timestamp                                            | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| updated_at    | timestamp                                            | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
+| file_new_name | varchar(255)                                         | YES  |     | NULL              |                                               |
+| title         | varchar(100)                                         | YES  |     | NULL              |                                               |
++---------------+------------------------------------------------------+------+-----+-------------------+-----------------------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> desc users;
++----------------------+---------------------------+------+-----+-------------------+-------------------+
+| Field                | Type                      | Null | Key | Default           | Extra             |
++----------------------+---------------------------+------+-----+-------------------+-------------------+
+| id                   | int                       | NO   | PRI | NULL              | auto_increment    |
+| email                | varchar(100)              | NO   | UNI | NULL              |                   |
+| password             | varchar(255)              | NO   |     | NULL              |                   |
+| created_at           | timestamp                 | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| branch               | varchar(50)               | NO   |     | NULL              |                   |
+| semester             | int                       | NO   |     | NULL              |                   |
+| resetToken           | varchar(255)              | YES  |     | NULL              |                   |
+| resetTokenExpiration | datetime                  | YES  |     | NULL              |                   |
+| phone                | varchar(15)               | NO   |     | NULL              |                   |
+| admission_number     | varchar(255)              | NO   | UNI | NULL              |                   |
+| full_name            | varchar(255)              | NO   |     | NULL              |                   |
+| profile_picture      | varchar(255)              | YES  |     | NULL              |                   |
+| user_status          | enum('active','inactive') | YES  |     | active            |                   |
++----------------------+---------------------------+------+-----+-------------------+-------------------+
+13 rows in set (0.00 sec)
+
+mysql>

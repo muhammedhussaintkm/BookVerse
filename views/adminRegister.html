@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration - BookVerse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+      <!-- Use Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+         
+        body {
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            position: relative;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+           /* Eye icon for password toggle */
+     /* Container for password input to position the eye icon */
+     .password-container {
+          position: relative;
+        }
+        /* Updated toggle icon using Font Awesome 6 syntax */
+        .toggle-password {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #888;
+          font-size: 18px;
+          z-index: 2;
+          /* Debug border to ensure it's visible (remove after verifying) */
+          /* border: 1px solid red; */
+        }
+        .brand-name {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .register-container {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        button[type="submit"] {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #007bb5;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #0095f6;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="brand-name">BookVerse</h1>
+    <div class="register-container">
+        <h2>Admin Registration</h2>
+        <form id="adminRegisterForm">
+            <input type="text" name="full_name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="specific_password" placeholder="Admin code" required>
+            <div class="password-container">
+                <input type="password" id="password" name="password" required placeholder="Password">
+                <!-- Use Font Awesome 6 classes: fa-solid -->
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+              </div>
+            <input type="password"  name="confirm_password" placeholder="Confirm Password" required>
+            <button type="submit">Register</button>
+        </form>
+        
+        <div id="registerMessage" class="error-message"></div>
+        
+        <div class="links">
+            <a href="/admin-login">Already have an account? Login</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('adminRegisterForm');
+        const registerMessage = document.getElementById('registerMessage');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                full_name: form.full_name.value.trim(),
+                email: form.email.value.trim(),
+                specific_password: form.specific_password.value.trim(),
+                new_password: form.password.value.trim(),
+                confirm_password: form.confirm_password.value.trim()
+            };
+
+            try {
+                const response = await fetch('/auth/admin-register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    registerMessage.textContent = 'Registration successful!,waiting for Admin-approval..';
+                    registerMessage.style.color = 'green';
+                    form.reset();
+                } else {
+                    registerMessage.textContent = data.message || 'Registration failed';
+                    registerMessage.style.color = 'red';
+                }
+            } catch (error) {
+                registerMessage.textContent = 'An error occurred. Please try again later.';
+                registerMessage.style.color = 'red';
+            }
+        });
+         // Toggle password visibility function
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.querySelector('.toggle-password');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+        function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.querySelector('.toggle-password');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Requests - BookVerse</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/superadmin.css">
+  <style>
+    /* Additional styling for cards if needed */
+    .admin-request-card {
+      background: #fff;
+      border: 1px solid #dbdbdb;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width : 100%;
+    }
+    .admin-request-card p {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .admin-request-card button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .approve-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .reject-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <button class="menu-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <h1>Admin Requests</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </nav>
+
+  <aside class="sidebar" id="sidebar">
+    <h1 class="brand_name1"><i class="fas fa-user-clock" style="color: white;"></i> &nbsp;Admin Requests</h1>
+    <button class="close-sidebar" onclick="toggleSidebar()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <ul>
+        <li onclick="navigateTo('superAdminDashboard')" style="color: white;"><i class="fas fa-home" style="color: white;"></i> Dashboard</li>
+        <li onclick="navigateTo('adminRequests')" style="color: white;"><i class="fas fa-user-clock" style="color: white;"></i> Admin Requests</li>
+        <li onclick="navigateTo('manageAdmins')" style="color: white;"><i class="fas fa-user-shield" style="color: white;"></i> Manage Admins</li>
+        <li onclick="logout()" style="color: white;"><i class="fas fa-sign-out-alt" style="color: white;"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <h2>&nbsp;&nbsp;Pending Admin Requests</h2>
+    <div id="adminRequestsList">
+      <!-- Pending admin request cards will be populated here -->
+    </div>
+  </main>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+    function navigateTo(page) {
+      window.location.href = `/${page}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("/superadmin/pendingAdmins")
+        .then(response => response.json())
+        .then(data => {
+          const list = document.getElementById("adminRequestsList");
+          list.innerHTML = "";
+          if (Array.isArray(data) && data.length === 0) {
+            list.innerHTML = "<p>No pending admin requests.</p>";
+          } else if (Array.isArray(data)) {
+            data.forEach(admin => {
+              if(admin.admin_status === 'pending') {
+                list.innerHTML += `
+                  <div class="admin-request-card">
+                    <p><strong>${admin.full_name}</strong> (${admin.email})</p>
+                    <button class="approve-btn" onclick="approveAdmin('${admin.email}')"><i class="fas fa-check"></i> Approve</button>
+                    <button class="reject-btn" onclick="rejectAdmin('${admin.email}')"><i class="fas fa-times"></i> Reject</button>
+                  </div>
+                `;
+              }
+            });
+          } else {
+            list.innerHTML = "<p>Error: Unexpected data format.</p>";
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching admin requests:', err);
+          document.getElementById("adminRequestsList").innerHTML = "<p>Error fetching admin requests.</p>";
+        });
+    });
+
+    function approveAdmin(email) {
+    if (confirm('Are you sure you want to approve this admin request?')) {
+      fetch('/superadmin/approveAdmin', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload();
+      })
+      .catch(err => console.error("Error approving admin:", err));
+    }
+  }
+
+
+    function rejectAdmin(email) {
+      if (confirm('Are you sure you want to reject this admin request?')) {
+        fetch(`/superadmin/rejectAdmin?email=${email}`, { method: "POST" })
+          .then(() => location.reload());
+      }
+    }
+  </script>
+</body>
+</html>

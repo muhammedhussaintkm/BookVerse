@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookVerse - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Page Background & Fonts */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* Top Navbar: three sections with fixed left/right widths */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1876db;
+      padding: 10px 20px;
+      color: white;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .nav-left, .nav-right {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-center {
+      flex: 1;
+      text-align: center;
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      color: #f7f1f1;
+      letter-spacing: 1px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    /* Small round profile pic in navbar (nav-left) */
+    .nav-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .nav-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #0056b3;
+      padding: 20px;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    .sidebar .sidebar-header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .sidebar-header .big-profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 10px;
+    }
+    .sidebar .sidebar-header .big-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sidebar .sidebar-header h2 {
+      color: white;
+      font-size: 20px;
+      margin: 0;
+    }
+    .sidebar .sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: white;
+      color: #0056b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .sidebar ul li {
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.5s ease, transform 0.3s ease;
+    }
+    .sidebar ul li:hover {
+      background: #004494;
+      transform: translateX(10px);
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+    /* Main Content styling */
+    .content {
+      padding: 20px;
+      margin-top: 80px;
+      margin-left: 20px;
+      transition: margin-left 0.5s ease;
+    }
+    .content.shifted {
+      margin-left: 270px; /* sidebar width + gap */
+    }
+    /* Book cards grid and styling */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .book-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .book-card img.cover-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .book-card h3 {
+      margin: 10px 0 5px;
+      font-size: 20px;
+    }
+    .book-card p {
+      margin: 5px 0;
+      color: #555;
+      font-size: 14px;
+    }
+    .book-card .action-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    .book-card .approve-btn {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .book-card .reject-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    /* subtle hover lift so cards never get overlapped */
+    .book-card:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="nav-profile" id="navProfile" onclick="openSidebar()">
+      <img id="smallPic" src="/user.jpg" alt="Admin Profile">
+    </div>
+    <h1 class="brand-name">BookVerse - Admin Dashboard</h1>
+    <div class="nav-right"></div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-close" id="sidebarClose" onclick="closeSidebar()">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <div class="big-profile">
+        <img id="mainProfilePic" src="/uploads/profile_pics/admin_big.jpg" alt="Admin Profile">
+      </div>
+      <h2 id="adminName">Admin Name</h2>
+    </div>
+    <ul>
+      <li onclick="navigateTo('admin-dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="navigateTo('manageUsers')"><i class="fas fa-users"></i> Manage Users</li>
+      <li onclick="navigateTo('manageBooks')"><i class="fas fa-book"></i> Manage Books</li>
+      <li onclick="navigateTo('manageFiles')"><i class="fas fa-file"></i> Manage Files</li>
+      <li onclick="navigateTo('adminProfile')"><i class="fas fa-user"></i> Profile</li>
+      <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content" id="dashboardContent">
+    <h2>Pending Books</h2>
+    <div class="cards-grid" id="booksContainer">
+      <!-- Book cards inserted here -->
+    </div>
+  </main>
+
+  <script>
+    // Grab email once
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+
+    // Convert seconds to "X mo Y d Z h W m"
+    function formatBidPeriod(seconds) {
+      const MONTH = 2592000, DAY = 86400, HOUR = 3600, MIN = 60;
+      const m = Math.floor(seconds / MONTH);
+      seconds %= MONTH;
+      const d = Math.floor(seconds / DAY);
+      seconds %= DAY;
+      const h = Math.floor(seconds / HOUR);
+      seconds %= HOUR;
+      const min = Math.floor(seconds / MIN);
+      const parts = [];
+      if (m) parts.push(`${m} mo`);
+      if (d) parts.push(`${d} d`);
+      if (h) parts.push(`${h} h`);
+      if (min) parts.push(`${min} m`);
+      return parts.join(' ') || '0 m';
+    }
+
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('active');
+      document.getElementById('navProfile').style.display = 'active';
+      document.getElementById('dashboardContent').classList.add('shifted');
+      document.getElementById('sidebarClose').style.transform = 'rotate(0deg)';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('navProfile').style.display = 'block';
+      document.getElementById('dashboardContent').classList.remove('shifted');
+      document.getElementById('sidebarClose').style.transform = 'rotate(-180deg)';
+    }
+
+    function navigateTo(page) {
+      const query = currentUserEmail ? `?email=${encodeURIComponent(currentUserEmail)}` : '';
+      window.location.href = `/${page}${query}`;
+    }
+
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+         // Fetch pending books & render cards
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/admin/pendingBooks')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('booksContainer');
+          container.innerHTML = '';
+          data.forEach(book => {
+            let purpose='', price='', status='', extra='';
+            if (book.status === 'sell_pending') {
+              purpose = 'For Sale';
+              price = book.sell_price;
+              status = 'sell_approved';
+            } else if (book.status === 'auction_pending') {
+              purpose = 'For Auction';
+              price = book.min_bid_price;
+              status = 'auction_approved';
+              extra = `<p><strong>Bid Period:</strong> ${formatBidPeriod(book.bid_period)}</p>`;
+            }
+            container.innerHTML += `
+              <div class="book-card">
+                <img src="/uploads/book_covers/${book.book_cover || 'default-cover.png'}" class="cover-img" alt="Cover">
+                <h3>${book.book_name}</h3>
+                <p><strong>Author:</strong> ${book.author}</p>
+                <p><strong>Edition:</strong> ${book.edition || 'N/A'}</p>
+                <p><strong>Uploader:</strong> ${book.uploader_name || 'N/A'}</p>
+                <p><strong>Purpose:</strong> ${purpose}</p>
+                <p><strong>Book Price:</strong> ${price}</p>
+                ${extra}
+                <button class="action-btn approve-btn" onclick="approveBook(${book.id}, '${status}')">Approve</button>
+                <button class="action-btn reject-btn" onclick="rejectBook(${book.id})">Reject</button>
+              </div>
+            `;
+          });
+        })
+        .catch(err => console.error('Error fetching pending books:', err));
+    });
+    // Approve book
+    function approveBook(id, approvedStatus) {
+      if (confirm('Are you sure you want to approve this book?')) {
+        // Send the book id and let the backend determine the new status based on current pending status.
+        fetch(`/admin/approveBook?id=${id}`, { method: 'POST' })
+          .then(response => response.json())
+          .then(() => location.reload())
+          .catch(err => console.error('Error approving book:', err));
+      }
+    }
+    // Reject book: update status to 'library'
+    function rejectBook(id) {
+      if (confirm('Are you sure you want to reject this book?')) {
+        fetch(`/admin/rejectBook?id=${id}`, { method: 'POST' })
+          .then(response => response.json())
+          .then(() => location.reload())
+          .catch(err => console.error('Error rejecting book:', err));
+      }
+    }
+   // Update Admin Data (Profile Picture and Name) on Page Load
+   document.addEventListener("DOMContentLoaded", function () {
+      console.log("Page loaded, fetching admin details for:", currentUserEmail);
+      fetch(`/admin/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(res => {
+          console.log("Response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Server responded with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Received admin data:", data);
+          // Use the 'profile' field from the database for the profile picture
+          const picUrl = data.profile
+            ? `/uploads/profile_pics/${data.profile}`
+            : '/user.jpg';
+          // Update images
+          const smallPic = document.getElementById("smallPic");
+          const bigProfile = document.getElementById("bigprofile");
+          const mainProfilePic = document.getElementById("mainProfilePic");
+          const profilePicPreview = document.getElementById("profilePicPreview");
+          if (smallPic) smallPic.src = picUrl;
+          if (bigProfile) bigProfile.src = picUrl;
+          if (mainProfilePic) mainProfilePic.src = picUrl;
+          if (profilePicPreview) profilePicPreview.src = picUrl;
+          // Update admin name in sidebar
+          const adminNameEl = document.getElementById("adminName");
+          if (adminNameEl) adminNameEl.textContent = data.full_name || "Admin";
+          // If there is an element for the header admin name, update it as well
+          const userNameHeaderEl = document.getElementById("userNameHeader");
+          if (userNameHeaderEl) {
+            userNameHeaderEl.textContent = data.full_name || "Admin";
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching admin info:", err);
+          const errorElement = document.getElementById("error-message");
+          if (errorElement) {
+            errorElement.textContent = "Failed to load admin information. Please try again.";
+          }
+        });
+    });
+    </script>
+</body>
+</html>

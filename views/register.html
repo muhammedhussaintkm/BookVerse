@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - BookVerse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+     <!-- Use Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+         /* Container for password input to position the eye icon */
+         .password-container {
+          position: relative;
+        }
+        /* Updated toggle icon using Font Awesome 6 syntax */
+        .toggle-password {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #888;
+          font-size: 18px;
+          z-index: 2;
+          /* Debug border to ensure it's visible (remove after verifying) */
+          /* border: 1px solid red; */
+        }
+        .register-container {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 9px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            background: #fafafa;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #007bb5;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #0095f6;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="register-container">
+        <h2>Sign Up</h2>
+        <form id="registerForm">
+            <input type="text" id="fullName" name="full_name" required placeholder="Full Name" minlength="3" maxlength="50">
+            <input type="text" id="admissionNumber" name="admissionNumber" required placeholder="Admission Number" minlength="3" maxlength="15">
+            <input type="email" id="email" name="email" required placeholder="Email">
+
+            <select id="branch" name="branch" required>
+                <option value="">Select Branch</option>
+                <option value="CSE">Computer Science</option>
+                <option value="ECE">Electronics and Communication</option>
+                <option value="EEE">Electrical and Electronics</option>
+                <option value="CE">Civil</option>
+            </select>
+
+            <select id="semester" name="semester" required>
+                <option value="">Select Semester</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+            </select>
+
+            <input type="text" id="phone" name="phone" required placeholder="Phone Number" pattern="[0-9]{10}" title="Enter a 10-digit phone number">
+            <div class="password-container">
+                <input type="password" id="password" name="password" required placeholder="Password">
+                <!-- Use Font Awesome 6 classes: fa-solid -->
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+              </div>
+            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm Password" minlength="8">
+            <button type="submit" id="submitBtn">Sign Up</button>
+        </form>
+
+        <div id="registerMessage" class="error-message"></div>
+
+        <div class="links">
+            Already have an account? <a href="/login.html">Log in</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const registerMessage = document.getElementById('registerMessage');
+        const submitBtn = document.getElementById('submitBtn');
+    
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            // Validate if passwords match before proceeding
+            if (form.password.value.trim() !== form.confirmPassword.value.trim()) {
+                registerMessage.textContent = 'Passwords do not match.';
+                registerMessage.style.color = 'red';
+                return;
+            }
+    
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing Up...';
+    
+            const formData = {
+                full_name: form.fullName.value.trim(),
+                email: form.email.value.trim(),
+                admissionNumber: form.admissionNumber.value.trim(),
+                branch: form.branch.value,
+                semester: form.semester.value,
+                phone: form.phone.value.trim(),
+                password: form.password.value.trim(),
+                confirmPassword: form.confirmPassword.value.trim()
+            };
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    registerMessage.textContent = 'Registration successful! You can now login.';
+                    registerMessage.style.color = 'green';
+                    form.reset();
+                } else {
+                    registerMessage.textContent = data.message || 'Registration failed. Please try again.';
+                    registerMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error("Error caught:", error);
+                registerMessage.textContent = 'An error occurred. Please try again later.';
+                registerMessage.style.color = 'red';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign Up';
+            }
+        });
+        function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.querySelector('.toggle-password');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+  
+    </script>
+    
+</body>
+</html>

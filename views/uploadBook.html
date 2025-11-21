@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upload Book - BookVerse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Include FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Reset & Global */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      position: relative;
+      background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?fm=jpg&q=80&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* Centered Form Container */
+    .form-container {
+      position: absolute;
+      top: 80%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 800px;
+    }
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    /* Cover Upload Card */
+    .cover-upload {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 20px;
+      width: 130px;
+      height: 180px;
+      transition: background 0.3s ease;
+    }
+    .cover-upload:hover {
+      background: #f0f0f0;
+    }
+    .cover-upload i {
+      font-size: 50px;
+      color: #007bff;
+    }
+    .cover-upload p {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+    /* Hidden file input (placed inside form so it gets submitted) */
+    .hidden-file {
+      display: none;
+    }
+    /* Form Styles */
+    .form-container form {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-container form input,
+    .form-container form select,
+    .form-container form textarea {
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .form-container form textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-container form button {
+      padding: 10px;
+      background: #0095f6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .form-container form button:hover {
+      background: #007bb5;
+    }
+    /* Link below the form */
+    .redirect-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .redirect-link a {
+      color: #007bb5;
+      text-decoration: none;
+    }
+    .redirect-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <!-- Upload Book Form -->
+    <form id="uploadBookForm" action="/uploadBook" method="POST" enctype="multipart/form-data">
+      <!-- Cover Upload Card -->
+      <div class="cover-upload" id="coverUploadCard" onclick="triggerFileInput()">
+        <i class="fas fa-plus"></i>
+        <p>Upload Cover Image</p>
+      </div>
+      <!-- Hidden File Input -->
+      <input type="file" name="book_cover" id="book_cover" accept="image/*" class="hidden-file" onchange="previewCover(event)">
+      
+      <!-- Other Form Fields -->
+      <input type="text" name="book_name" placeholder="Book Name" required>
+      <input type="text" name="author" placeholder="Author" required>
+      <input type="text" name="edition" placeholder="Edition">
+      <textarea name="description" placeholder="Description"></textarea>
+      <select name="condition" required>
+        <option value="">Book Condition</option>
+        <option value="new">New</option>
+        <option value="good">Good</option>
+        <option value="fair">Fair</option>
+        <option value="poor">Poor</option>
+      </select>
+      <select name="semester" required>
+        <option value="">Semester</option>
+        <option value="1">Semester 1</option>
+        <option value="2">Semester 2</option>
+        <option value="3">Semester 3</option>
+        <option value="4">Semester 4</option>
+        <option value="5">Semester 5</option>
+        <option value="6">Semester 6</option>
+        <option value="7">Semester 7</option>
+        <option value="8">Semester 8</option>
+        <option value="All semester">Any Semester</option>
+      </select>
+      <select name="department" required>
+        <option value="">Department</option>
+        <option value="CSE">CSE</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="CE">CE</option>
+        <option value="All departments">Any Departments</option>
+      </select>
+      <button type="submit">Submit</button>
+    </form>
+    <!-- Link to redirect to user page -->
+    <div class="redirect-link">
+      <a id="myBooksLink" href="#">Don't want to upload?</a>
+    </div>
+  </div>
+
+  <script>
+     function triggerFileInput() {
+      document.getElementById('book_cover').click();
+    }
+    function previewCover(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('coverUploadCard').innerHTML =
+            `<img src="${e.target.result}" alt="Cover" style="width:130%;border-radius:10px;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    // 1) Pull email from URL once, globally:
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+    if (!currentUserEmail) {
+      console.error("No user email provided in URL query parameters.");
+    }
+   
+    document.addEventListener('DOMContentLoaded', () => {
+  // 1. Grab the email out of the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentUserEmail = urlParams.get('email');
+  if (!currentUserEmail) {
+    console.error("No user email provided in URL query parameters.");
+    return;
+  }
+
+  // 2. Find the link and set its href
+  const link = document.getElementById('myBooksLink');
+  link.href = `/myBooks?email=${encodeURIComponent(currentUserEmail)}`;
+});
+
+    // b) Hook up AJAX form submit
+    const form = document.getElementById('uploadBookForm');
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        if (!formData.get('book_cover')) {
+          alert('Please select a cover image before submitting.');
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            `/uploadBook?email=${encodeURIComponent(currentUserEmail)}`,
+            { method: 'POST', body: formData }
+          );
+          const data = await res.json();
+          console.log('Response:', data);
+          if (res.ok) {
+            window.location.href = `/myBooks?email=${encodeURIComponent(currentUserEmail)}`;
+          } else {
+            alert('Upload failed: ' + data.message);
+          }
+        } catch (err) {
+          console.error('Error submitting form:', err);
+          alert('An error occurred. Please try again.');
+        }
+      });
+  </script>
+</body>
+</html>

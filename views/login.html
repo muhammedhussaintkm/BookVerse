@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BookVerse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+      <!-- Use Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            position: relative;
+        }
+            /* Eye icon for password toggle */
+    .toggle-password {
+      position: absolute;
+      right: 20px;
+      top: calc(50% - 10px);
+      cursor: pointer;
+      color: #888;
+      font-size: 18px;
+    }
+    /* Container for password input to position the eye icon */
+    .password-container {
+          position: relative;
+        }
+        /* Updated toggle icon using Font Awesome 6 syntax */
+        .toggle-password {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #888;
+          font-size: 18px;
+          z-index: 2;
+          /* Debug border to ensure it's visible (remove after verifying) */
+          /* border: 1px solid red; */
+        }
+
+        .brand-name {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 4.3);
+        }
+
+        .login-container {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            width: 350px;
+            text-align: center;
+            border-radius: 9px;
+        }
+
+        h2 {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        button[type="submit"] {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #007bb5;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #0095f6;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #8e8e8e;
+            margin: 20px 0;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dbdbdb;
+        }
+
+        .separator:not(:empty)::before {
+            margin-right: .25em;
+        }
+
+        .separator:not(:empty)::after {
+            margin-left: .25em;
+        }
+
+        /* Admin Login Button */
+        .admin-login {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 2px 10px 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-login::before {
+            content: '\1F464'; /* Unicode for user icon */
+            font-size: 14px;
+            color: black;
+            margin-right: 5px;
+        }
+
+        .admin-login a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .admin-login a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Login Button -->
+    <div class="admin-login">
+        <a href="/admin-login">Admin Login</a>
+    </div>
+
+    <h1 class="brand-name">BookVerse</h1>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="email" name="email" required placeholder="Email">
+            <div class="password-container">
+                <input type="password" id="password" name="password" required placeholder="Password">
+                <!-- Use Font Awesome 6 classes: fa-solid -->
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+              </div>
+            <button type="submit">Log In</button>
+        </form>
+        
+        <div id="loginMessage" class="error-message"></div>
+        
+        <div class="separator">OR</div>
+
+        <div class="links">
+            <a href="/forgot-password">Forgot password?</a>
+        </div>
+
+        <div class="links">
+            Don't have an account? <a href="/register">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const loginMessage = document.getElementById('loginMessage');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const email = form.email.value.trim();
+            const password = form.password.value.trim();
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+
+                if (response.ok) {
+                    loginMessage.textContent = 'Login successful!';
+                    loginMessage.style.color = 'green';
+                    form.reset();
+                    // Pass the entered email as a query parameter to dashboard
+                    window.location.href = `/dashboard?email=${encodeURIComponent(email)}`;
+                } else {
+                    loginMessage.textContent = data.message || 'Invalid email or password';
+                    loginMessage.style.color = 'red';
+                }
+            } catch (error) {
+                loginMessage.textContent = 'An error occurred. Please try again later.';
+                loginMessage.style.color = 'red';
+            }
+        });
+        function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.querySelector('.toggle-password');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+    </script>
+</body>
+</html>

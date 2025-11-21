@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Admins</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/superadmin.css">
+    <style>
+        .cards-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .admin-card {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .admin-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .admin-details {
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+        .admin-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .active-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .inactive-btn {
+            background-color: #ffc107;
+            color: white;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="brand_name">Manage Admins</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </nav>
+    
+    <aside class="sidebar" id="sidebar">
+        <h1 class="brand_name1"><i class="fas fa-user-shield" style="color: white;"></i> &nbsp;Manage Admins</h1>
+        <button class="close-sidebar" onclick="toggleSidebar()"><i class="fas fa-arrow-left"></i></button>
+        <ul>
+            <li onclick="navigateTo('superAdminDashboard')" style="color: white;"><i class="fas fa-home" style="color: white;"></i> Dashboard</li>
+            <li onclick="navigateTo('adminRequests')" style="color: white;"><i class="fas fa-user-clock" style="color: white;"></i> Admin Requests</li>
+            <li onclick="navigateTo('manageAdmins')" style="color: white;"><i class="fas fa-user-shield" style="color: white;"></i> Manage Admins</li>
+            <li onclick="logout()" style="color: white;"><i class="fas fa-sign-out-alt" style="color: white;"></i> Logout</li>
+        </ul>
+    </aside>
+
+    <main class="content">
+        <h2>&nbsp;&nbsp;&nbsp;&nbsp;Admin List</h2>
+        <div id="adminList"></div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function navigateTo(page) {
+            window.location.href = `/${page}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/superadmin/admins")
+                .then(response => response.json())
+                .then(data => {
+                    const adminList = document.getElementById("adminList");
+                    adminList.innerHTML = "";
+                    data.forEach(admin => {
+                        // Use a default image if profile is missing or invalid
+                        const profilePic = admin.profile || '/default_admin.png';  
+                        const statusClass = admin.admin_status === 'active' ? 'active-btn' : 'inactive-btn';
+                        const statusText = admin.admin_status === 'active' ? 'Active' : 'Inactive';
+                        adminList.innerHTML += `
+                            <div class="admin-card">
+                                <img src="/uploads/profile_pics/${profilePic}" alt="Profile" class="admin-img">
+                                <div class="admin-details">
+                                    <p><strong>Name:</strong> ${admin.full_name}</p>
+                                    <p><strong>Email:</strong> ${admin.email}</p>
+                                    <p><strong>Department:</strong> ${admin.department || 'N/A'}</p>
+                                    <p><strong>Phone:</strong> ${admin.phone || 'N/A'}</p>
+                                </div>
+                                <div class="admin-actions">
+                                    <button class="${statusClass}" onclick="toggleAdminStatus('${admin.email}', this)">
+                                        ${statusText}
+                                    </button>
+                                    <button class="remove-btn" onclick="removeAdmin('${admin.email}', this)">Remove</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                })
+                .catch(err => console.error("Error fetching admins:", err));
+        });
+
+        function toggleAdminStatus(email, button) {
+            const newStatus = button.textContent.trim() === 'Active' ? 'inactive' : 'active';
+            fetch(`/superadmin/updateStatus?email=${email}&status=${newStatus}`, { method: "POST" })
+                .then(response => response.json())
+                .then(() => {
+                    const updatedText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    button.textContent = updatedText;
+                    button.classList.toggle('active-btn');
+                    button.classList.toggle('inactive-btn');
+                });
+        }
+
+        function removeAdmin(email, button) {
+            fetch(`/superadmin/removeAdmin?email=${email}`, { method: "DELETE" })
+                .then(() => button.closest('.admin-card').remove());
+        }
+    </script>
+</body>
+</html>

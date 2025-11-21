@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sell Books - BookVerse</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/user.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">BookVerse</div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search books to sell...">
+      <i class="fas fa-search"></i>
+    </div>
+    <img src="/default-profile.png" alt="Profile" class="profile-pic" onclick="toggleSidebarRight()">
+  </header>
+
+  <!-- Right Sidebar -->
+  <div class="sidebar-right" id="sidebarRight">
+    <button class="close-sidebar-right" onclick="toggleSidebarRight()">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="profile-container">
+      <img src="/default-profile.png" alt="Profile" id="sidebarProfilePic" class="sidebar-profile-pic">
+    </div>
+    <h2 id="userNameHeader"></h2>
+    <ul>
+        <li onclick="navigateTo('dashboard')">Home</li>
+        <li onclick="navigateTo('myBooks')">My Books</li>
+        <li onclick="navigateTo('sellBooks')">Sell Books</li>
+        <li onclick="navigateTo('uploadStudyMaterials')">Upload Study Materials</li>
+        <li onclick="navigateTo('myActivity')">My Activity</li>
+        <li onclick="navigateTo('profile')">Profile</li>
+        <li onclick="logout()">Logout</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content">
+    <h2>Sell Books</h2>
+    <!-- Form or content for selling books goes here -->
+  </main>
+
+  <script>
+    function toggleSidebarRight() {
+      document.getElementById('sidebarRight').classList.toggle('active');
+    }
+    function navigateTo(page) {
+      window.location.href = `/${page}`;
+    }
+    function logout() {
+      window.location.href = '/login.html';
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch('/user/me')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("userNameHeader").textContent = data.full_name;
+        })
+        .catch(error => {
+          console.error('Error fetching user info:', error);
+          document.getElementById("userNameHeader").textContent = "User";
+        });
+    });
+  </script>
+</body>
+</html>

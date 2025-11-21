@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - BookVerse</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/user.css">
+  <style>
+    .hidden {
+  display: none !important;
+}
+.modal {
+  display: block; /* override default so .hidden works */
+}
+.edit-btn-container {
+  position: fixed;
+  right: 35%;
+  bottom: 40%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.edit-btn-instagram {
+  
+  
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #334fcc; 
+  background-size: 300% 300%;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: gradientBG 4s ease infinite;
+  transition: opacity 0.2s;
+}
+
+@keyframes gradientBG {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+.edit-btn-instagram:hover {
+  opacity: 0.9;
+}
+
+    /* Optional additional styling for the profile page */
+    .profile-container-main {
+      max-width: 600px;
+      margin: 10px auto 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #1876db;
+    }
+    .profile-details p {
+      font-size: 16px;
+      margin: 8px 0;
+    }
+    /* Instagram‑style Edit Profile Modal */
+#editProfileModal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Heading */
+#editProfileModal h3 {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1b1b1b;
+}
+
+/* Profile pic circle */
+#profilePicCard {
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+#profilePicCard:hover {
+  transform: scale(1.05);
+}
+
+/* Inputs grid */
+#editProfileModal input[type="text"],
+#editProfileModal input[type="number"],
+#editProfileModal input[type="tel"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 14px;
+  color: #262626;
+  transition: border-color 0.2s, background 0.2s;
+}
+#editProfileModal input:focus {
+  outline: none;
+  border-color: #3897f0;
+  background: #fff;
+}
+
+/* Labels */
+#editProfileModal label {
+  font-size: 14px;
+  color: #353434;
+}
+
+/* File input trigger icon */
+#profilePicCard i {
+  color: #3897f0;
+}
+
+/* Buttons container */
+#editProfileModal .btn-submit,
+#editProfileModal .btn-back {
+  display: inline-block;
+  margin: 0 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+/* Instagram‑style gradient Save button */
+#editProfileModal .btn-submit {
+  background:#486be0 ;
+  background-size: 200% 200%;
+  color: #fff;
+  animation: gradientBG 3s ease infinite;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#editProfileModal .btn-submit:hover {
+  opacity: 0.9;
+}
+
+/* Cancel button */
+#editProfileModal .btn-back {
+  background: #fafafa;
+  color: #262626;
+  border: 1px solid #dbdbdb;
+}
+#editProfileModal .btn-back:hover {
+  background: #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  #editProfileModal {
+    padding: 16px;
+  }
+  #editProfileModal h3 {
+    font-size: 18px;
+  }
+}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">BookVerse</div>
+    
+    <img id="sidebarProfileoutPic" src="user.jpg" alt="Profile" class="profile-pic" onclick="toggleSidebarRight()">
+  </header>
+
+  <!-- Right Sidebar -->
+  <div class="sidebar-right" id="sidebarRight">
+    <button class="close-sidebar-right" onclick="toggleSidebarRight()">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="profile-container">
+      <img id="sidebarProfilePic" src="user.jpg" alt="Profile" class="sidebar-profile-pic">
+    </div>
+    <h2 id="userNameHeader"></h2>
+    <ul>
+      <li onclick="navigateTo('dashboard')">Home</li>
+      <li onclick="navigateTo('myBooks')">My Books</li>
+      <li onclick="navigateTo('uploadStudyMaterials')">Upload Study Materials</li>
+      <li onclick="navigateTo('Notifications')">Notifications</li>
+      <li onclick="navigateTo('profile')">Profile</li>
+      <li onclick="logout()">Logout</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content">
+   
+    <div class="profile-container-main">
+      <div class="edit-btn-container">
+        <button id="editProfileBtn" class="edit-btn-instagram">
+          <i class="fas fa-edit"></i> Edit Profile
+        </button>
+      </div>
+      <div class="profile-header">
+        <img id="mainProfilePic" src="user.jpg" alt="Profile Picture">
+        <h2 id="profileName">Your Name</h2>
+      </div>
+      <div class="profile-details">
+        <!-- Hidden Edit Form -->
+<div id="editProfileModal" class="modal hidden" style="position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.3);width:90%;max-width:500px;z-index:2000;">
+  <h3>Edit Your Profile</h3>
+  <!-- Round card preview -->
+  <div style="text-align:center; margin-bottom:15px;">
+    <div id="profilePicCard" style="width:120px;height:120px;border-radius:50%;overflow:hidden;margin:0 auto;cursor:pointer;border:3px solid #1876db;">
+      <img id="profilePicPreview" src="user.jpg" alt="Preview" style="width:100%;height:100%;object-fit:cover;">
+
+    </div>
+    <input type="file" id="profilePicInput" name="profile_picture" accept="image/*" class="hidden">
+  </div>
+  <!-- Fields -->
+  <div style="display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;">
+    <label for="editFullName">Full Name:</label>
+    <input type="text" id="editFullName" required>
+
+    <label for="editAdmission">Admission #:</label>
+    <input type="text" id="editAdmission" required>
+
+    <label for="editBranch">Branch:</label>
+    <input type="text" id="editBranch" required>
+
+    <label for="editSemester">Semester:</label>
+    <input type="number" id="editSemester" min="1" max="8" required>
+
+    <label for="editPhone">Phone:</label>
+    <input type="tel" id="editPhone" pattern="\d{10}" placeholder="10‑digit number" required>
+  </div>
+  <!-- Buttons -->
+  <div style="text-align:center; margin-top:20px;">
+    <button id="saveProfileBtn" class="btn-submit">Save</button>
+    <button id="cancelProfileBtn" class="btn-back">Cancel</button>
+  </div>
+</div>
+        <p><strong>Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <span id="profileEmail"></span></p>
+        <p><strong>Branch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <span id="profileBranch"></span></p>
+        <p><strong>Semester&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <span id="profileSemester"></span></p>
+        <p><strong>Phone&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> <span id="profilePhone"></span></p>
+        <p><strong>Admission Number&nbsp;:</strong> <span id="profileAdmission"></span></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+   
+const urlParams = new URLSearchParams(window.location.search);
+const currentUserEmail = urlParams.get('email');
+if (!currentUserEmail) {
+  console.error("No email in URL!");
+}
+
+// 1) Show modal on Edit click
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+  document.getElementById('editProfileModal').classList.remove('hidden');
+  // Prefill fields from the already‑loaded profile data
+  document.getElementById('editFullName').value    = document.getElementById('profileName').textContent;
+  document.getElementById('editAdmission').value   = document.getElementById('profileAdmission').textContent;
+  document.getElementById('editBranch').value      = document.getElementById('profileBranch').textContent;
+  document.getElementById('editSemester').value    = document.getElementById('profileSemester').textContent;
+  document.getElementById('editPhone').value       = document.getElementById('profilePhone').textContent;
+  // Preview existing pic
+  const existingPic = document.getElementById('mainProfilePic').src;
+  document.getElementById('profilePicPreview').src = existingPic;
+});
+
+// 2) Trigger file picker when clicking the round card
+document.getElementById('profilePicCard').addEventListener('click', () => {
+  document.getElementById('profilePicInput').click();
+});
+
+// 3) Preview new pic
+document.getElementById('profilePicInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('profilePicPreview').src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// 4) Cancel → close modal and go back to profile (no save)
+document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+  window.location.href = `/profile?email=${encodeURIComponent(currentUserEmail)}`;
+});
+
+// 5) Save → submit via AJAX with FormData
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const full_name  = document.getElementById('editFullName').value.trim();
+  const admission  = document.getElementById('editAdmission').value.trim();
+  const branch     = document.getElementById('editBranch').value.trim();
+  const semester   = document.getElementById('editSemester').value.trim();
+  const phone      = document.getElementById('editPhone').value.trim();
+
+  if (!/^\d{10}$/.test(phone)) {
+    alert("Phone must be exactly 10 digits.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('full_name', full_name);
+  formData.append('admission_number', admission);
+  formData.append('branch', branch);
+  formData.append('semester', semester);
+  formData.append('phone', phone);
+  const fileInput = document.getElementById('profilePicInput');
+  if (fileInput.files[0]) {
+    formData.append('profile_picture', fileInput.files[0]);
+  }
+
+  try {
+    const res = await fetch(`/user/updateProfile?email=${encodeURIComponent(currentUserEmail)}`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error||data.message);
+    // On success, redirect back to profile
+    window.location.href = `/profile?email=${encodeURIComponent(currentUserEmail)}`;
+  } catch(err) {
+    console.error(err);
+    alert("Error saving profile: " + err.message);
+  }
+});
+
+
+    function toggleSidebarRight() {
+      document.getElementById('sidebarRight').classList.toggle('active');
+    }
+    
+    function navigateTo(page) {
+    const base = `/${page}`;
+    const query = currentUserEmail
+      ? `?email=${encodeURIComponent(currentUserEmail)}`
+      : '';
+    window.location.href = base + query;
+  }
+    function logout() {
+      window.location.href = '/login.html';
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+  fetch(`/user/me?email=${encodeURIComponent(currentUserEmail)}`)
+    .then(res => res.json())
+    .then(data => {
+      // Compute the image URL or fallback to a default
+      const picUrl = data.profile_picture
+        ? `/uploads/profile_pics/${data.profile_picture}`
+        : '/user.jpg';  // or '/user.jpg' if that’s your default
+
+      // Update main profile pic, sidebar pic, and modal preview
+      sidebarProfileoutPic
+      // these three lines replace the default with the real pic
+      document.getElementById("sidebarProfileoutPic").src    = picUrl;
+      document.getElementById("mainProfilePic").src    = picUrl;
+      document.getElementById("sidebarProfilePic").src = picUrl;
+      document.getElementById("profilePicPreview").src = picUrl;
+      // … rest of your field population …= picUrl;
+
+      // Populate text fields
+      document.getElementById("userNameHeader").textContent = data.full_name;
+      document.getElementById("profileName").textContent    = data.full_name;
+      document.getElementById("profileEmail").textContent   = data.email;
+      document.getElementById("profileBranch").textContent  = data.branch;
+      document.getElementById("profileSemester").textContent= data.semester;
+      document.getElementById("profilePhone").textContent   = data.phone;
+      document.getElementById("profileAdmission").textContent = data.admission_number;
+    })
+    .catch(err => console.error('Error fetching user info:', err));
+});
+  </script>
+</body>
+</html> 

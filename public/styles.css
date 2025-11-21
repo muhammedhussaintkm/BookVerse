@@ -1,0 +1,105 @@
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: url('/background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.brand-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 40px;
+  color: #333;
+  letter-spacing: 1px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+  margin-bottom: 15px;
+}
+
+.container {
+  background: #fff;
+  padding: 20px;
+  width: 90%;
+  max-width: 350px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+button {
+  background: #3897f0;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #287dc0;
+}
+
+a {
+  color: #3897f0;
+  text-decoration: none;
+  display: block;
+  margin-top: 10px;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #8e8e8e;
+  margin: 20px 0;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.separator:not(:empty)::before {
+  margin-right: .25em;
+}
+
+.separator:not(:empty)::after {
+  margin-left: .25em;
+}
+
+/* Make Full Name, Admission Number, and Phone Number fields the same width */
+input[type="text"] {
+  width: 100%;
+}
+
+/* Admin Login Link */
+.admin-login a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.admin-login a:hover {
+  text-decoration: underline;
+}

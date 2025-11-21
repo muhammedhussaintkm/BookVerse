@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Books - BookVerse</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/user.css">
+  <style>
+    /* You can add additional custom styling as needed */
+    /* Example: Centering the search box nicely in the header */
+    .search-box {
+      position: relative;
+      display: inline-block;
+    }
+    .search-box input {
+      padding: 8px 30px 8px 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+    }
+    .search-box i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">BookVerse</div>
+    
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search books..." oninput="filterMyBooks()">
+      <i class="fas fa-search"></i>
+    </div>
+    <img src="user.jpg" alt="Profile" class="profile-pic" onclick="toggleSidebarRight()">
+  </header>
+
+  <!-- Right Sidebar (User Menu) -->
+  <div class="sidebar-right" id="sidebarRight">
+    <button class="close-sidebar-right" onclick="toggleSidebarRight()">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="profile-container">
+      <img src="user.jpg" alt="Profile" id="sidebarProfilePic" class="sidebar-profile-pic">
+    </div>
+    <h2 id="userNameHeader"></h2>
+    <ul>
+      <li onclick="navigateTo('dashboard')">Home</li>
+      <li onclick="navigateTo('myBooks')">My Books</li>
+      <li onclick="navigateTo('uploadStudyMaterials')">Upload Study Materials</li>
+      <li onclick="navigateTo('Notifications')">Notifications</li>
+      <li onclick="navigateTo('profile')">Profile</li>
+      <li onclick="logout()">Logout</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content">
+    <h2>My Books</h2>
+    <div id="booksContainer" class="grid">
+      <!-- Upload Book Card remains at the top -->
+      <div class="card_upload_card" onclick="navigateTo('uploadbook')">
+        <i class="fas fa-plus"></i>
+        <h3>Upload Book</h3>
+      </div>
+      <!-- Book cards will be appended here -->
+    </div>
+  </main>
+
+  <script>
+    // Sidebar toggling and navigation functions
+    function toggleSidebarRight() {
+      document.getElementById('sidebarRight').classList.toggle('active');
+    }
+    function navigateTo(page) {
+    const base = `/${page}`;
+    const query = currentUserEmail
+      ? `?email=${encodeURIComponent(currentUserEmail)}`
+      : '';
+    window.location.href = base + query;
+  }
+    function logout() {
+      window.location.href = '/logout';
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('id');
+    const currentUserEmail = urlParams.get('email');
+    // Fetch current user details to update header
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch(`/user/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(response => response.json())
+        .then(data => {
+          // Compute the image URL or fallback to default
+      const picUrl = data.profile_picture
+        ? `/uploads/profile_pics/${data.profile_picture}`
+        : '/user.jpg';
+
+      // Update header profile pic (the one with class="profile-pic")
+      const headerPic = document.querySelector('.profile-pic');
+      if (headerPic) headerPic.src = picUrl;
+
+      // Update sidebar profile pic
+      const sidebarPic = document.getElementById('sidebarProfilePic');
+      if (sidebarPic) sidebarPic.src = picUrl;
+          if (data && data.full_name) {
+            document.getElementById("userNameHeader").textContent = data.full_name;
+          } else {
+            document.getElementById("userNameHeader").textContent = "User";
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user info:', error);
+          document.getElementById("userNameHeader").textContent = "User";
+        });
+
+      // Fetch books and populate book cards (excluding the upload card)
+      fetch(`/user/mybooks?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(response => response.json())
+        .then(data => {
+          const booksContainer = document.getElementById('booksContainer');
+          // Get the upload card element so that it stays at the top
+          const uploadCard = document.querySelector('.card_upload_card');
+          
+          // Remove any previously added dynamic book cards (if needed)
+          const existingCards = document.querySelectorAll('.card.dynamic-book');
+          existingCards.forEach(card => card.remove());
+
+          data.forEach(book => {
+            // Create a new card for each book
+            const card = document.createElement('div');
+            card.className = 'card dynamic-book';
+            card.onclick = () => {
+              // Redirect to the book details page using the book id
+              window.location.href = `/mybookDetails?id=${book.id}&email=${encodeURIComponent(currentUserEmail)}`;
+            };
+            // Use book_cover (ensure the backend returns this field) or a default image
+            const coverPath = book.book_cover ? `/${book.book_cover}` : '/default-book.jpg';
+            // Build the inner HTML of the card including book name, author, and edition
+            card.innerHTML = `
+              <img src="/uploads/book_covers/${coverPath}" alt="Book Cover">
+              <h3>${book.book_name}</h3>
+              <p>${book.author}</p>
+              <p>status: for ${book.type}</p>
+              <p>${book.edition ? 'Edition: ' + book.edition : ''}</p>
+            `;
+            // Append the new card after the upload card
+            booksContainer.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error fetching books:', err));
+    });
+    function filterMyBooks() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const bookCards = document.querySelectorAll('.card.dynamic-book');
+      bookCards.forEach(card => {
+        // Convert card text to lowercase and check if it contains the query
+        card.style.display = card.innerText.toLowerCase().includes(query) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+/* user.css */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+/* Additional styling for cards if needed */
+.user-notifi-card {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width : 100%;
+}
+.user-notifi-card p {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.user-notifi-card button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 10px;
+}
+/* Global Body Styles */
+body {
+  background: #f5f5f5;
+}
+
+/* Header Styles */
+.header {
+  background-color: #1876db;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.search-box {
+  flex: 1;
+  margin: 0 20px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 40px 8px 12px;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+}
+
+.search-box i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 18px;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+/* Right Sidebar (User Menu) */
+.sidebar-right {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 280px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+  transition: right 0.3s ease;
+  z-index: 1500;
+  padding: 20px;
+}
+
+.sidebar-right.active {
+  right: 0;
+}
+
+.sidebar-right h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #1876db;
+}
+
+.sidebar-right ul {
+  list-style: none;
+}
+
+.sidebar-right ul li {
+  margin: 15px 0;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.sidebar-right ul li:hover {
+  color: #1876db;
+}
+
+/* Tab Bar */
+.tab-bar {
+  margin-top: 60px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-bar button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab-bar button:hover,
+.tab-bar button.active {
+  background: #e0e0e0;
+}
+
+/* Content Area */
+.content {
+  padding: 20px;
+  margin-top: 120px; /* height of header + tab bar */
+}
+
+/* Grid for Cards */
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+/* Card Styles */
+.card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+/* Card Styles */
+.card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.card h3 {
+  margin: 10px 0 5px;
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #666;
+}
+.card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+/* Upload Card Styles */
+.card_upload_card {
+  background: #fff;
+  padding: 20px; /* Reduced padding for more control */
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centers content vertically */
+  align-items: center;     /* Centers content horizontally */
+  position: relative;
+  height: 300px; /* Fixed height for the card */
+}
+
+.card_upload_card:hover {
+  transform: scale(1.02);
+}
+
+.card_upload_card i {
+  font-size: 50px;
+  /* Centered by flex, no extra margin needed */
+}
+
+/* Position the heading at the bottom */
+.card_upload_card h3 {
+  position: absolute;
+  bottom: 30px;   /* Adjust as needed */
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Right Sidebar (User Menu) - Additional styling */
+.sidebar-right .profile-container {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.sidebar-right .sidebar-profile-pic {
+  width: 100px;        /* Adjust size as needed */
+  height: 100px;       /* Adjust size as needed */
+  border-radius: 50%;  /* Makes the image round */
+  object-fit: cover;
+  border: 2px solid #1876db;  /* Optional: adds a border around the image */
+}
+
+/* Close button styles */
+.close-sidebar-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #1876db;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+ /*  Optionally, hide the button when sidebar is closed (if desired)*/
+     .sidebar-right:not(.active) .close-sidebar-right {
+       display: none;
+     }
+  

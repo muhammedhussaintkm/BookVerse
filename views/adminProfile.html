@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - BookVerse</title>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/user.css">
+  <style>
+    /* Page Background & Fonts */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .modal {
+      display: block; /* override default so .hidden works */
+    }
+    /* Top Navbar */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1876db;
+      padding: 10px 20px;
+      color: white;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .nav-left, .nav-right {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-center {
+      flex: 1;
+      text-align: center;
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      color: #f7f1f1;
+      letter-spacing: 1px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    /* Nav Profile (small) */
+    .nav-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .nav-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #0056b3;
+      padding: 20px;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    .sidebar .sidebar-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .sidebar-header .big-profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 10px;
+    }
+    .sidebar .sidebar-header .big-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sidebar .sidebar-header h2 {
+      color: white;
+      font-size: 20px;
+      margin: 0;
+    }
+    .sidebar .sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: white;
+      color: #0056b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .sidebar ul li {
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.5s ease, transform 0.3s ease;
+    }
+    .sidebar ul li:hover {
+      background: #004494;
+      transform: translateX(10px);
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+    /* Main Content */
+    .dashboard {
+      margin-top: 80px; /* space for navbar */
+      padding: 20px;
+      margin-left: 20px;
+      transition: margin-left 0.9s ease;
+    }
+    /* Edit Profile Button Container */
+    .edit-btn-container {
+      text-align: center;
+      margin-top: 20px;
+      position: relative;
+      height: 60px; /* reserve space */
+    }
+    /* Instagram‑style Edit Profile Button */
+    .edit-btn-instagram {
+      position: absolute;
+      right: 35%;
+      top: 540%;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: #334fcc;
+      background-size: 300% 300%;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: gradientBG 4s ease infinite;
+      transition: opacity 0.2s;
+    }
+    @keyframes gradientBG {
+      0%   { background-position: 0%   50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0%   50%; }
+    }
+    .edit-btn-instagram:hover {
+      opacity: 0.9;
+    }
+    /* Profile Container */
+    .profile-container-main {
+      max-width: 600px;
+      margin: 10px auto 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #1876db;
+    }
+    .profile-details p {
+      font-size: 16px;
+      margin: 8px 0;
+    }
+    /* Edit Profile Modal */
+    #editProfileModal {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+    }
+    #editProfileModal h3 {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1b1b1b;
+    }
+    #profilePicCard {
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      margin: 0 auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    #profilePicCard:hover {
+      transform: scale(1.05);
+    }
+    #profilePicCard img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #editProfileModal input[type="text"],
+    #editProfileModal input[type="number"],
+    #editProfileModal input[type="tel"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dbdbdb;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 14px;
+      color: #262626;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    #editProfileModal input:focus {
+      outline: none;
+      border-color: #3897f0;
+      background: #fff;
+    }
+    #editProfileModal label {
+      font-size: 14px;
+      color: #353434;
+    }
+    #profilePicCard i {
+      color: #3897f0;
+    }
+    #editProfileModal .btn-submit,
+    #editProfileModal .btn-back {
+      display: inline-block;
+      margin: 0 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #editProfileModal .btn-submit {
+      background: #486be0;
+      background-size: 200% 200%;
+      color: #fff;
+      animation: gradientBG 3s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    #editProfileModal .btn-submit:hover {
+      opacity: 0.9;
+    }
+    #editProfileModal .btn-back {
+      background: #fafafa;
+      color: #262626;
+      border: 1px solid #dbdbdb;
+    }
+    #editProfileModal .btn-back:hover {
+      background: #f0f0f0;
+    }
+    @media (max-width: 480px) {
+      #editProfileModal {
+        padding: 16px;
+      }
+      #editProfileModal h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <!-- Left: Small round profile pic -->
+    <div class="nav-profile" id="navProfile" onclick="openSidebar()">
+      <img id="smallPic" src="/user.jpg" alt="Admin Profile">
+    </div>
+    <h1 class="brand-name">BookVerse </h1>
+    <!-- Right side: (Logout button can be added later) -->
+    <div class="nav-right"></div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <!-- Close button -->
+      <div class="sidebar-close" id="sidebarClose" onclick="closeSidebar()">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <!-- Big admin profile picture -->
+      <div class="big-profile">
+        <img id="bigprofile" src="/user.jpg" alt="Admin Profile">
+      </div>
+      <!-- Admin Name (Updated later from fetch) -->
+      <h2 id="adminName">Admin Name</h2>
+    </div>
+    <ul>
+      <li onclick="navigateTo('admin-dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="navigateTo('manageUsers')"><i class="fas fa-users"></i> Manage Users</li>
+      <li onclick="navigateTo('manageBooks')"><i class="fas fa-book"></i> Manage Books</li>
+      <li onclick="navigateTo('manageFiles')"><i class="fas fa-file"></i> Manage Files</li>
+      <li onclick="navigateTo('adminProfile')"><i class="fas fa-user"></i> Profile</li>
+      <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <!-- Edit Profile Button -->
+    <div class="edit-btn-container">
+      <button id="editProfileBtn" class="edit-btn-instagram">
+        <i class="fas fa-edit"></i> Edit Profile
+      </button>
+    </div>
+
+    <!-- Profile Container -->
+    <div class="profile-container-main">
+      <div class="profile-header">
+        <img id="mainProfilePic" src="/user.jpg" alt="Profile Picture">
+        <h2 id="profileName">Your Name</h2>
+      </div>
+      <div class="profile-details">
+        <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+        <p><strong>Department:</strong> <span id="profileDepartment"></span></p>
+        <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal (hidden by default) -->
+  <div id="editProfileModal" class="modal hidden">
+    <h3>Edit Your Profile</h3>
+    <!-- Round Profile Pic Preview -->
+    <div style="text-align: center; margin-bottom: 15px;">
+      <div id="profilePicCard">
+        <img id="profilePicPreview" src="/user.jpg" alt="Preview">
+      </div>
+      <input type="file" id="profilePicInput" name="profile_picture" accept="image/*" class="hidden">
+    </div>
+    <!-- Input Fields -->
+    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: center;">
+      <label for="editFullName">Full Name:</label>
+      <input type="text" id="editFullName" required>
+
+     
+
+      <label for="editDepartment">Department:</label>
+      <input type="text" id="editDepartment" required>
+
+      <label for="editPhone">Phone:</label>
+      <input type="tel" id="editPhone" pattern="\d{10}" placeholder="10‑digit number" required>
+    </div>
+    <!-- Modal Buttons -->
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="saveProfileBtn" class="btn-submit">Save</button>
+      <button id="cancelProfileBtn" class="btn-back">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+    if (!currentUserEmail) {
+      console.error("No email in URL!");
+    }
+
+    // Open Edit Profile Modal
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      document.getElementById('editProfileModal').classList.remove('hidden');
+      // Pre-fill fields with current profile info
+      document.getElementById('editFullName').value = document.getElementById('profileName').textContent;
+      
+      document.getElementById('editDepartment').value = document.getElementById('profileDepartment').textContent;
+      document.getElementById('editPhone').value = document.getElementById('profilePhone').textContent;
+      // Set preview to current profile picture
+      const existingPic = document.getElementById('mainProfilePic').src;
+      document.getElementById('profilePicPreview').src = existingPic;
+    });
+
+    // Trigger file input on profile pic card click
+    document.getElementById('profilePicCard').addEventListener('click', () => {
+      document.getElementById('profilePicInput').click();
+    });
+
+    // Preview new profile picture when a file is selected
+    document.getElementById('profilePicInput').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('profilePicPreview').src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Cancel button: redirect back to profile page
+    document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+      window.location.href = `/adminprofile?email=${encodeURIComponent(currentUserEmail)}`;
+    });
+
+    // Save button: submit profile update via AJAX using FormData
+    document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+      const full_name  = document.getElementById('editFullName').value.trim();
+      const department = document.getElementById('editDepartment').value.trim();
+      const phone      = document.getElementById('editPhone').value.trim();
+
+      if (!/^\d{10}$/.test(phone)) {
+        alert("Phone must be exactly 10 digits.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('full_name', full_name);
+      formData.append('department', department);
+      formData.append('phone', phone);
+      const fileInput = document.getElementById('profilePicInput');
+      if (fileInput.files[0]) {
+        formData.append('profile_picture', fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetch(`/admin/updateProfile?email=${encodeURIComponent(currentUserEmail)}`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || data.message);
+        // On success, redirect back to admin profile page
+        window.location.href = `/adminprofile?email=${encodeURIComponent(currentUserEmail)}`;
+      } catch(err) {
+        console.error(err);
+        alert("Error saving profile: " + err.message);
+      }
+    });
+
+    // Sidebar functions
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+    }
+    function navigateTo(page) {
+      const query = currentUserEmail ? `?email=${encodeURIComponent(currentUserEmail)}` : '';
+      window.location.href = `/${page}${query}`;
+    }
+    function logout() {
+      window.location.href = '/login.html';
+    }
+
+    // On page load: fetch admin details from server and update profile elements
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("Page loaded, starting admin data fetch...");
+      if (!currentUserEmail) {
+        console.error("No email in URL!");
+        return;
+      }
+      console.log("Fetching data for email:", currentUserEmail);
+
+      fetch(`/admin/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(res => {
+          console.log("Response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Server responded with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Received admin data:", data);
+          // Determine profile picture URL; fallback to default if not set
+          const picUrl = data.profile_picture
+            ? `/uploads/profile_pics/${data.profile_picture}`
+            : '/user.jpg';
+
+          // Update profile images (make sure elements exist)
+          const smallPic = document.getElementById("smallPic");
+          const bigprofile = document.getElementById("bigprofile");
+          const mainProfilePic = document.getElementById("mainProfilePic");
+          const profilePicPreview = document.getElementById("profilePicPreview");
+
+          if (smallPic) smallPic.src = picUrl;
+          if (bigprofile) bigprofile.src = picUrl;
+          if (mainProfilePic) mainProfilePic.src = picUrl;
+          if (profilePicPreview) profilePicPreview.src = picUrl;
+
+          // Update text fields
+          const userNameHeader = document.getElementById("userNameHeader");
+          const profileName = document.getElementById("profileName");
+          const profileEmail = document.getElementById("profileEmail");
+          const profileDepartment = document.getElementById("profileDepartment");
+          const profilePhone = document.getElementById("profilePhone");
+          const adminName = document.getElementById("adminName"); // Sidebar admin name
+
+          if (userNameHeader) userNameHeader.textContent = data.full_name || "Admin";
+          if (profileName) profileName.textContent = data.full_name || "Admin";
+          if (profileEmail) profileEmail.textContent = data.email || "N/A";
+          if (profileDepartment) profileDepartment.textContent = data.department || "N/A";
+          if (profilePhone) profilePhone.textContent = data.phone || "N/A";
+          if (adminName) adminName.textContent = data.full_name || "Admin";
+        })
+        .catch(err => {
+          console.error("Error fetching admin info:", err);
+          const errorElement = document.getElementById("error-message");
+          if (errorElement) {
+            errorElement.textContent = "Failed to load admin information. Please try again.";
+          }
+        });
+    });
+  </script>
+</body>
+</html>

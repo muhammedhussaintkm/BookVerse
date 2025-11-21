@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BookVerse - Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/user.css">
+  <style>
+    /* Additional styling for cards if needed */
+    
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">BookVerse</div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search books,departments,semesters..." oninput="filterCards()">
+
+      <i class="fas fa-search"></i>
+    </div>
+    <img src="user.jpg" alt="Profile" class="profile-pic" onclick="toggleSidebarRight()">
+  </header>
+
+  <!-- Right Sidebar (User Menu) -->
+  <div class="sidebar-right" id="sidebarRight">
+    <button class="close-sidebar-right" onclick="toggleSidebarRight()">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="profile-container">
+      <img src="user.jpg" alt="Profile" id="sidebarProfilePic" class="sidebar-profile-pic">
+    </div>
+    <h2 id="userNameHeader"></h2>
+    <ul>
+      <li onclick="navigateTo('dashboard')">Home</li>
+      <li onclick="navigateTo('myBooks')">My Books</li>
+      <li onclick="navigateTo('uploadStudyMaterials')">Upload Study Materials</li>
+      <li onclick="navigateTo('Notifications')">Notifications</li>
+      <li onclick="navigateTo('profile')">Profile</li>
+      <li onclick="logout()">Logout</li>
+    </ul>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button id="tabBooks" class="active" onclick="showTab('books')">Books</button>
+    <button id="tabStudy" onclick="showTab('study')">Study Materials</button>
+  </div>
+
+  <!-- Content Area -->
+  <main class="content">
+    <div id="booksTab" class="grid">
+      <!-- Books cards will be populated here -->
+    </div>
+    <div id="studyTab" class="grid" style="display: none;">
+      <!-- Study materials cards will be populated here -->
+    </div>
+  </main>
+
+  <script>
+    // Function to filter cards based on search query
+function filterCards() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  
+  // Check which tab is currently visible
+  const booksTab = document.getElementById('booksTab');
+  const studyTab = document.getElementById('studyTab');
+  
+  if (booksTab.style.display !== "none") {
+    // Filter book cards
+    const bookCards = booksTab.querySelectorAll('.card');
+    bookCards.forEach(card => {
+      // Convert card text to lowercase and check if it contains the query
+      card.style.display = card.innerText.toLowerCase().includes(query) ? 'block' : 'none';
+    });
+  }
+  
+  if (studyTab.style.display !== "none") {
+    // Filter study material cards
+    const studyCards = studyTab.querySelectorAll('.card');
+    studyCards.forEach(card => {
+      card.style.display = card.innerText.toLowerCase().includes(query) ? 'block' : 'none';
+    });
+  }
+}
+
+    // Toggle the right sidebar (user menu)
+    function toggleSidebarRight() {
+      document.getElementById('sidebarRight').classList.toggle('active');
+    }
+
+    function navigateTo(page) {
+    const base = `/${page}`;
+    const query = currentUserEmail
+      ? `?email=${encodeURIComponent(currentUserEmail)}`
+      : '';
+    window.location.href = base + query;
+  }
+  
+  
+  function startCardCountdown(cardId, bidEnd) {
+  const countdownElem = document.getElementById(`countdown_${cardId}`);
+  if (!countdownElem) return;
+  const interval = setInterval(() => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = bidEnd - now;
+    if (diff <= 0) {
+      clearInterval(interval);
+      // Time's up! Call cancelAuction to reset status and buyer_status
+      fetch('/user/cancelAuction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: cardId })
+      })
+      .then(res => res.json())
+      .then(() => {
+        // Reload the page so the UI reflects library status
+        window.location.reload();
+      })
+      .catch(err => console.error('Error reverting auction:', err));
+    } else {
+      const days = Math.floor(diff / 86400);
+      const hours = Math.floor((diff % 86400) / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+      countdownElem.textContent = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+  }, 1000);
+}
+
+
+    // Logout function
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+    // Redirect to Buy or Bid page (already including email)
+  function redirectToPage(bookId, status) {
+    if (status === "sell_approved") {
+      window.location.href =
+        `/BuyPage?id=${bookId}&email=${encodeURIComponent(currentUserEmail)}`;
+    } else if (status === "auction_approved") {
+      window.location.href =
+        `/BidPage?id=${bookId}&email=${encodeURIComponent(currentUserEmail)}`;
+    }
+  }
+
+    // Tab switching function with dynamic placeholder update
+    function showTab(tab) {
+      document.getElementById('booksTab').style.display = (tab === 'books') ? 'grid' : 'none';
+      document.getElementById('studyTab').style.display = (tab === 'study') ? 'grid' : 'none';
+      document.getElementById('tabBooks').classList.toggle('active', tab === 'books');
+      document.getElementById('tabStudy').classList.toggle('active', tab === 'study');
+      const searchInput = document.getElementById('searchInput');
+      searchInput.placeholder = (tab === 'books') ? 'Search books,departments,semsters...' : 'Search study materials,departments,semesters...';
+    }
+    // New function to handle book card click with uploader check
+    function handleBookCardClick(bookId, status, cardElement) {
+      const uploader = cardElement.getAttribute('data-uploader');
+      if (currentUserEmail && currentUserEmail === uploader) {
+        // If current user is the uploader, redirect to mybookDetails
+        window.location.href = `/mybookDetails?id=${bookId}&email=${encodeURIComponent(currentUserEmail)}`;
+      } else {
+        // Else, use existing redirect behavior
+        redirectToPage(bookId, status);
+      }
+    }
+    // Global variable for current user email (passed from login page)
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('id');
+    const currentUserEmail = urlParams.get('email');
+    if (!currentUserEmail) {
+      console.error("No user email provided in URL query parameters.");
+    }
+
+    // Merged DOMContentLoaded: Fetch user details and content
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch current user's details, passing the email from URL
+  fetch(`/user/me?email=${encodeURIComponent(currentUserEmail)}`)
+    .then(response => response.json())
+    .then(data => {
+      // Compute the image URL or fallback to default
+      const picUrl = data.profile_picture
+        ? `/uploads/profile_pics/${data.profile_picture}`
+        : '/user.jpg';
+
+      // Update header profile pic (the one with class="profile-pic")
+      const headerPic = document.querySelector('.profile-pic');
+      if (headerPic) headerPic.src = picUrl;
+
+      // Update sidebar profile pic
+      const sidebarPic = document.getElementById('sidebarProfilePic');
+      if (sidebarPic) sidebarPic.src = picUrl;
+      console.log('Fetched user data:', data);
+      document.getElementById("userNameHeader").textContent =
+        data.full_name || "User";
+    })
+    .catch(error => {
+      console.error('Error fetching user info:', error);
+      document.getElementById("userNameHeader").textContent = "User";
+    });
+
+      // Fetch Books data
+      fetch('/user/showbooks')
+        .then(response => response.json())
+        .then(data => {
+          const booksContainer = document.getElementById('booksTab');
+          booksContainer.innerHTML = "";
+          data.forEach(book => {
+            let priceInfo = "";
+            let statusInfo = "";
+            let countdownHtml = "";
+            if (book.status === "sell_approved") {
+              priceInfo = `<p>Price: ${book.sell_price}</p>`;
+              statusInfo = `<p>Status: For sale</p>`;
+            } else if (book.status === "auction_approved") {
+              priceInfo = `<p>Highest Bid: ${book.max_bid}</p>`;
+              statusInfo = `<p>Status: For auction</p>`;
+              countdownHtml = `<p id="countdown_${book.id}"></p>`;
+            }
+            // Build the card element using template literals.
+            // We include data-uploader attribute to store uploader_id.
+            booksContainer.innerHTML += `
+              <div class="card" id="card_${book.id}" data-uploader="${book.uploader_id}" onclick="handleBookCardClick(${book.id}, '${book.status}', this)" style="cursor:pointer;">
+                <img src="/uploads/book_covers/${book.book_cover}" alt="Book Cover">
+                <h3>${book.book_name}</h3>
+                <p>${book.author}</p>
+                <p>Edition: ${book.edition}</p>
+                ${priceInfo}
+                ${statusInfo}
+                ${countdownHtml}
+              </div>
+            `;
+          });
+          // Start countdown timers for each auction_approved book
+          data.forEach(book => {
+            if (book.status === "auction_approved" && book.bid_end) {
+              startCardCountdown(book.id, book.bid_end);
+            }
+          });
+        })
+        .catch(err => console.error('Error fetching books:', err));
+
+      // Fetch Study Materials data
+      fetch('/user/showstudymaterial')
+        .then(response => response.json())
+        .then(data => {
+          const studyContainer = document.getElementById('studyTab');
+          studyContainer.innerHTML = "";
+          data.forEach(material => {
+            if(material.status === 'approved') {
+              const ext = material.file_name.split('.').pop().toLowerCase();
+              let sampleCover = '/sample_covers/default.jpg';
+              switch(ext) {
+                case 'pdf':
+                  sampleCover = 'pdf.png';
+                  break;
+                case 'doc':
+                case 'txt':
+                case 'docx':
+                  sampleCover = 'txt.png';
+                  break;
+                case 'ppt':
+                case 'pptx':
+                  sampleCover = 'ppt.ppt';
+                  break;
+                default:
+                  sampleCover = 'default.jpg';
+              }
+              studyContainer.innerHTML += `
+                <div class="card" onclick="window.location.href='showFileDetails?id=${material.id}&email=${encodeURIComponent(currentUserEmail)}'" style="cursor:pointer;">
+                  <img src="${sampleCover}" alt="File Icon">
+                  <h3>${material.file_name}</h3>
+                  <p>Semester: ${material.semester}</p>
+                  <p>Department: ${material.department}</p>
+                </div>
+              `;
+            }
+          });
+        })
+        .catch(err => console.error('Error fetching study materials:', err));
+    });
+  </script>
+</body>
+</html>

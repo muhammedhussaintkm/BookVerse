@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - BookVerse</title>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/user.css">
+  <style>
+    /* Page Background & Fonts */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* Top Navbar: three sections with fixed left/right widths */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1876db;
+      padding: 10px 20px;
+      color: white;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .nav-left, .nav-right {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-center {
+      flex: 1;
+      text-align: center;
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      color: #f7f1f1;
+      letter-spacing: 1px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    /* Small round profile pic in navbar (nav-left) */
+    .nav-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .nav-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Right arrow button in navbar (nav-right) */
+    .nav-arrow {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: white;
+      color: #1876db;
+      display: none; /* hidden by default */
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    .nav-arrow.visible {
+      display: flex;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #0056b3;
+      padding: 20px;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    /* Sidebar Header: Big profile pic & admin name */
+    .sidebar .sidebar-header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .sidebar-header .big-profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 10px;
+    }
+    .sidebar .sidebar-header .big-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sidebar .sidebar-header h2 {
+      color: white;
+      font-size: 20px;
+      margin: 0;
+    }
+    /* Sidebar Close Arrow positioned at top right of sidebar */
+    .sidebar .sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: white;
+      color: #0056b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    /* Sidebar navigation tabs */
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .sidebar ul li {
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.5s ease, transform 0.3s ease;
+    }
+    .sidebar ul li:hover {
+      background: #004494;
+      transform: translateX(10px);
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+    /* Main Dashboard Content */
+    .dashboard {
+      margin-top: 80px; /* space for navbar */
+      padding: 20px;
+      transition: margin-left 0.5s ease;
+      margin-left: 20px;
+    }
+    .dashboard.shifted {
+      margin-left: 270px; /* sidebar width (250px) + gap (20px) */
+    }
+    /* Data Card styling */
+    .cards-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .data-card {
+      background-color: white;
+      padding: 50px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.5s ease, background 0.3s ease, color 0.3s ease;
+      text-align: center;
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .data-card i {
+      font-size: 90px;
+      transition: color 0.3s ease;
+    }
+    .data-card:hover {
+      transform: scale(1.05);
+      background-color: #007bff;
+      color: white;
+    }
+    .data-card:hover i {
+      color: white;
+    }
+    /* Additional styles for the search bar and cards */
+    .search-container {
+      text-align: center;
+      margin: 90px auto 20px;
+      width: 80%;
+      max-width: 600px;
+    }
+    .search-container input {
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .user-card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+    .user-card img.profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .user-card h3 {
+      font-size: 18px;
+      margin: 10px 0 5px;
+    }
+    .user-card p {
+      font-size: 14px;
+      margin: 3px 0;
+      color: #555;
+    }
+    .user-card .action-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    .user-card .active-btn {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .user-card .inactive-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .user-card .change-btn {
+      background-color: #007bff;
+      color: #fff;
+    }
+    /* New style for remove button */
+    .user-card .remove-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    /* 1) Smoothly shift content right when sidebar opens */
+.content {
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+}
+.sidebar.active ~ .content {
+  margin-left: 250px; /* same width as your sidebar */
+}
+
+/* 2) Card hover lift effect */
+.user-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="nav-profile" id="navProfile" onclick="openSidebar()">
+      <img id="smallPic" src="/user.jpg" alt="Admin Profile">
+    </div>
+    <h1 class="brand-name">BookVerse - Manage Users</h1>
+    <div class="nav-right"></div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-close" id="sidebarClose" onclick="closeSidebar()">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <div class="big-profile">
+        <img id="bigprofile" src="/user.jpg" alt="Admin Profile">
+      </div>
+      <h2 id="adminName">Admin Name</h2>
+    </div>
+    <ul>
+      <li onclick="navigateTo('admin-dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="navigateTo('manageUsers')"><i class="fas fa-users"></i> Manage Users</li>
+      <li onclick="navigateTo('manageBooks')"><i class="fas fa-book"></i> Manage Books</li>
+      <li onclick="navigateTo('manageFiles')"><i class="fas fa-file"></i> Manage Files</li>
+      <li onclick="navigateTo('adminProfile')"><i class="fas fa-user"></i> Profile</li>
+      <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="search-container">
+      <input type="text" id="userSearch" placeholder="Search users by name...">
+    </div>
+    <div class="cards-grid" id="usersContainer">
+      <!-- User cards will be dynamically inserted here -->
+    </div>
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    // Grab the current admin email from the URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+    if (!currentUserEmail) {
+      console.error("No email in URL!");
+    }
+
+    // Sidebar Functions
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+    }
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+    function logout() {
+      window.location.href = '/logout';
+    }
+    function navigateTo(page) {
+      const query = currentUserEmail
+        ? `?email=${encodeURIComponent(currentUserEmail)}`
+        : '';
+      window.location.href = `/${page}${query}`;
+    }
+
+    // Fetch admin details and update profile images and admin name
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("Page loaded, fetching admin details for:", currentUserEmail);
+      fetch(`/admin/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(res => {
+          console.log("Response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Server responded with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Received admin data:", data);
+          // Use data.profile (as defined in your admins table) for profile picture
+          const picUrl = data.profile
+            ? `/uploads/profile_pics/${data.profile}`
+            : '/user.jpg';
+          // Update profile images
+          const smallPic = document.getElementById("smallPic");
+          const bigProfile = document.getElementById("bigprofile");
+          const mainProfilePic = document.getElementById("mainProfilePic");
+          const profilePicPreview = document.getElementById("profilePicPreview");
+          if (smallPic) smallPic.src = picUrl;
+          if (bigProfile) bigProfile.src = picUrl;
+          if (mainProfilePic) mainProfilePic.src = picUrl;
+          if (profilePicPreview) profilePicPreview.src = picUrl;
+
+          // Update admin name in sidebar and, if applicable, in other elements (like nav header)
+          const adminNameEl = document.getElementById("adminName");
+          if (adminNameEl) adminNameEl.textContent = data.full_name || "Admin";
+
+          // Optionally update another element (if you have one) for admin name, e.g. userNameHeader
+          const userNameHeaderEl = document.getElementById("userNameHeader");
+          if (userNameHeaderEl) userNameHeaderEl.textContent = data.full_name || "Admin";
+        })
+        .catch(err => {
+          console.error("Error fetching admin info:", err);
+          const errorElement = document.getElementById("error-message");
+          if (errorElement) {
+            errorElement.textContent = "Failed to load admin information. Please try again.";
+          }
+        });
+
+      // Fetch users and populate cards
+      fetch('/admin/users')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('usersContainer');
+          container.innerHTML = "";
+          data.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            // Create HTML for the user card
+            card.innerHTML = `
+              <img src="/uploads/profile_pics/${user.profile_picture || 'default-profile.png'}" alt="Profile" class="profile-img">
+              <h3>${user.full_name}</h3>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Admission #:</strong> ${user.admission_number}</p>
+              <p><strong>Branch:</strong> ${user.branch}</p>
+              <p><strong>Semester:</strong> ${user.semester}</p>
+              <p><strong>Phone:</strong> ${user.phone}</p>
+              <button class="action-btn ${user.user_status === 'active' ? 'active-btn' : 'inactive-btn'}" onclick="toggleStatus('${user.email}', '${user.user_status}')">
+                ${user.user_status === 'active' ? 'Active' : 'Inactive'}
+              </button>
+              <button class="action-btn change-btn" onclick="changePassword('${user.email}', this)">Change Password</button>
+              <button class="action-btn remove-btn" onclick="removeUser('${user.email}', this)">Remove</button>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error fetching users:', err));
+    });
+
+    // Search functionality for user cards
+    document.getElementById('userSearch').addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const cards = document.querySelectorAll('.user-card');
+      cards.forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = name.includes(searchTerm) ? 'block' : 'none';
+      });
+    });
+
+    // Toggle user status function
+    function toggleStatus(email, currentStatus) {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      fetch('/admin/updateUserStatus', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, status: newStatus })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        location.reload();
+      })
+      .catch(err => console.error('Error updating user status:', err));
+    }
+
+    // Redirect to change password page (pass email)
+    function changePassword(email) {
+      window.location.href = `/changePassword?id=${encodeURIComponent(email)}&email=${encodeURIComponent(currentUserEmail)}`;
+    }
+
+    // Remove user function
+    function removeUser(email, button) {
+      fetch('/admin/removeUser?email=' + encodeURIComponent(email), { method: 'DELETE' })
+        .then(response => response.json())
+        .then(() => {
+          button.closest('.user-card').remove();
+        })
+        .catch(err => console.error('Error removing user:', err));
+    }
+  </script>
+</body>
+</html>

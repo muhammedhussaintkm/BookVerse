@@ -1,0 +1,114 @@
+/* admin.css */
+
+/* Top Navigation Bar */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1876db;
+    padding: 10px 20px;
+    color: white;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .top-nav h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Round profile picture at nav bar */
+  .nav-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  /* Close nav button (arrow) */
+  .close-nav-btn {
+    font-size: 24px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #0056b3;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    padding-top: 60px;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .sidebar.active {
+    left: 0;
+  }
+  
+  /* Sidebar header with medium-sized profile picture and admin name */
+  .sidebar .sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+  
+  .sidebar .sidebar-header img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar .sidebar-header h2 {
+    color: white;
+    font-size: 18px;
+  }
+  
+  /* Sidebar list items */
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  
+  .sidebar ul li:hover {
+    background: #004494;
+    transform: translateX(10px);
+  }
+  
+  .sidebar ul li i {
+    font-size: 18px;
+    width: 30px;
+    text-align: center;
+  }
+  
+  /* Profile option styling (if needed) 
+  .sidebar ul li.profile-option {
+}/* Add additional styling for the profile option if desired */
+  
+  

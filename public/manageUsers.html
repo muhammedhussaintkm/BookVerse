@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Super Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="superadmin.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        .search-container {
+            position: relative;
+            width: 300px;
+            margin: 10px auto;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px 40px;
+            border-radius: 20px;
+            border: 1px solid #dbdbdb;
+            background-color: #f0f0f0;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .search-bar:focus {
+            background-color: #ffffff;
+            border-color: #bbb;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #8e8e8e;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="brand_name">BookVerse - Super Admin</h1>
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </nav>
+    
+    <aside class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="toggleSidebar()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <ul>
+            <li><a href="superAdminDashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="adminRequests.html"><i class="fas fa-user-shield"></i> Admin Requests</a></li>
+            <li><a href="manageUsers.html"><i class="fas fa-users"></i> Manage Users</a></li>
+            <li><a href="manageAdmins.html"><i class="fas fa-user-cog"></i> Manage Admins</a></li>
+            <li><a href="reports.html"><i class="fas fa-chart-line"></i> Reports</a></li>
+            <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </aside>
+    
+    
+    <main class="dashboard">
+        <h2 class=brand-name>Manage Users</h2>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchUser" placeholder="Search users..." class="search-bar">
+        </div>
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Profile Picture</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Admission Number</th>
+                </tr>
+            </thead>
+            <tbody id="userTable">
+                <!-- User rows will be added dynamically -->
+            </tbody>
+        </table>
+    </main>
+    <script>
+        function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
+        }
+        
+        document.querySelector(".logout-btn").addEventListener("click", function () {
+            window.location.href = "login.html";
+        });
+        
+        const users = [
+            { profile: "profile1.jpg", name: "John Doe", email: "johndoe@example.com", admission: "2024001" },
+            { profile: "profile2.jpg", name: "Jane Smith", email: "janesmith@example.com", admission: "2024002" }
+        ];
+        
+        function loadUsers() {
+            const tableBody = document.getElementById("userTable");
+            tableBody.innerHTML = "";
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><img src="${user.profile}" alt="Profile" width="40"></td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.admission}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        document.getElementById("searchUser").addEventListener("input", function () {
+            const searchValue = this.value.toLowerCase();
+            document.querySelectorAll("#userTable tr").forEach(row => {
+                const name = row.children[1].textContent.toLowerCase();
+                row.style.display = name.includes(searchValue) ? "" : "none";
+            });
+        });
+        
+        document.addEventListener("DOMContentLoaded", loadUsers);
+    </script>
+</body>
+</html>

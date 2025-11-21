@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookVerse - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    /* Page Background & Fonts */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3') no-repeat center center fixed;
+      background-size: cover;
+    }
+    /* Top Navbar: three sections with fixed left/right widths */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1876db;
+      padding: 10px 20px;
+      color: white;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .nav-left, .nav-right {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nav-center {
+      flex: 1;
+      text-align: center;
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      color: #f7f1f1;
+      letter-spacing: 1px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+    /* Small round profile pic in navbar (nav-left) */
+    .nav-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .nav-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Right arrow button in navbar (nav-right) */
+    .nav-arrow {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: white;
+      color: #1876db;
+      display: none; /* hidden by default */
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    .nav-arrow.visible {
+      display: flex;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #0056b3;
+      padding: 20px;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    /* Sidebar Header: Big profile pic & admin name */
+    .sidebar .sidebar-header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .sidebar-header .big-profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 10px;
+    }
+    .sidebar .sidebar-header .big-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sidebar .sidebar-header h2 {
+      color: white;
+      font-size: 20px;
+      margin: 0;
+    }
+    /* Sidebar Close Arrow positioned at top right of sidebar */
+    .sidebar .sidebar-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: white;
+      color: #0056b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    /* Sidebar navigation tabs */
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .sidebar ul li {
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.5s ease, transform 0.3s ease;
+    }
+    .sidebar ul li:hover {
+      background: #004494;
+      transform: translateX(10px);
+    }
+    .sidebar ul li i {
+      margin-right: 10px;
+    }
+    /* Main Dashboard Content */
+    .dashboard {
+      margin-top: 80px; /* space for navbar */
+      padding: 20px;
+      transition: margin-left 0.5s ease;
+      margin-left: 20px;
+    }
+    .dashboard.shifted {
+      margin-left: 270px; /* sidebar width (250px) + gap (20px) */
+    }
+    /* Data Card styling */
+    .cards-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .data-card {
+      background-color: white;
+      padding: 50px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.5s ease, background 0.3s ease, color 0.3s ease;
+      text-align: center;
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .data-card i {
+      font-size: 90px;
+      transition: color 0.3s ease;
+    }
+    .data-card:hover {
+      transform: scale(1.05);
+      background-color: #007bff;
+      color: white;
+    }
+    .data-card:hover i {
+      color: white;
+    }
+    /* Search bar styling */
+    .search-container {
+      position: relative;
+      margin: 20px auto 30px;
+      width: 100%;
+      max-width: 500px;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 12px 40px 12px 15px;
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    #searchInput:focus {
+      box-shadow: 0 0 0 2px #1876db88;
+    }
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .book-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      position: relative;
+    }
+    .book-card img.cover-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .book-card h3 {
+      margin: 10px 0 5px;
+      font-size: 20px;
+    }
+    .book-card p {
+      margin: 5px 0;
+      color: #555;
+      font-size: 14px;
+    }
+    .action-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    .remove-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .countdown {
+      font-weight: bold;
+      color: #ff4500;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<!-- Top Navigation Bar -->
+<nav class="top-nav">
+  <!-- Left: Small round profile pic -->
+  <div class="nav-profile" id="navProfile" onclick="openSidebar()">
+    <img id =smallPic src="/user.jpg" alt="Admin Profile">
+  </div>
+  <h1 class="brand-name">BookVerse - Manage Books</h1>
+  <!-- Right side: Logout button will be implemented here in upcoming codes -->
+  <div class="nav-right"></div>
+</nav>
+  <!-- Sidebar -->
+  <!-- Sidebar (overlays the navbar when open) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <!-- Close button at top right of sidebar -->
+      <div class="sidebar-close" id="sidebarClose" onclick="closeSidebar()">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <!-- Big admin profile picture -->
+      <div class="big-profile">
+        <img id="bigprofile" src="/user.jpg" alt="Admin Profile">
+      </div>
+      <!-- Admin Name -->
+      <h2 id="adminName">Admin Name</h2>
+    </div>
+    <ul>
+      <li onclick="navigateTo('admin-dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="navigateTo('manageUsers')"><i class="fas fa-users"></i> Manage Users</li>
+      <li onclick="navigateTo('manageBooks')"><i class="fas fa-book"></i> Manage Books</li>
+      <li onclick="navigateTo('manageFiles')"><i class="fas fa-file"></i> Manage Files</li>
+      <li onclick="navigateTo('adminProfile')"><i class="fas fa-user"></i> Profile</li>
+      <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+    </ul>
+  </aside>
+  <main class="content">
+    <h2>Manage Books</h2>
+    <div class="search-container">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search by book name, author, department, semester..." 
+        oninput="filterBooks()" 
+      />
+      
+    </div>
+    <div class="cards-grid" id="booksContainer">
+      <!-- Book cards will be dynamically inserted here -->
+    </div>
+  </main>
+
+  <script>
+    // Grab the current admin email from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUserEmail = urlParams.get('email');
+    if (!currentUserEmail) {
+      console.error("No email in URL!");
+    }
+
+    // Sidebar Functions
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('active');
+    }
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+    function logout() {
+      window.location.href = '/logout';
+    }
+    function navigateTo(page) {
+      const query = currentUserEmail ? `?email=${encodeURIComponent(currentUserEmail)}` : '';
+      window.location.href = `/${page}${query}`;
+    }
+
+    // Update Admin Data (Profile Picture and Name) on Page Load
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log("Page loaded, fetching admin details for:", currentUserEmail);
+      fetch(`/admin/me?email=${encodeURIComponent(currentUserEmail)}`)
+        .then(res => {
+          console.log("Response status:", res.status);
+          if (!res.ok) {
+            throw new Error(`Server responded with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Received admin data:", data);
+          // Use the 'profile' field from the database for the profile picture
+          const picUrl = data.profile
+            ? `/uploads/profile_pics/${data.profile}`
+            : '/default-profile.png';
+          // Update images
+          const smallPic = document.getElementById("smallPic");
+          const bigProfile = document.getElementById("bigprofile");
+          const mainProfilePic = document.getElementById("mainProfilePic");
+          const profilePicPreview = document.getElementById("profilePicPreview");
+          if (smallPic) smallPic.src = picUrl;
+          if (bigProfile) bigProfile.src = picUrl;
+          if (mainProfilePic) mainProfilePic.src = picUrl;
+          if (profilePicPreview) profilePicPreview.src = picUrl;
+          // Update admin name in sidebar
+          const adminNameEl = document.getElementById("adminName");
+          if (adminNameEl) adminNameEl.textContent = data.full_name || "Admin";
+          // If there is an element for the header admin name, update it as well
+          const userNameHeaderEl = document.getElementById("userNameHeader");
+          if (userNameHeaderEl) {
+            userNameHeaderEl.textContent = data.full_name || "Admin";
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching admin info:", err);
+          const errorElement = document.getElementById("error-message");
+          if (errorElement) {
+            errorElement.textContent = "Failed to load admin information. Please try again.";
+          }
+        });
+    });
+
+    // The following functions (e.g., filterBooks) and dynamic book card population code remain unchanged.
+
+    // (Example) Function to filter books based on search input
+    function filterBooks() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.book-card');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(query) ? 'block' : 'none';
+      });
+    }
+
+   // Fetch books and populate cards
+   document.addEventListener('DOMContentLoaded', function () {
+      fetch('/admin/manageBooks')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('booksContainer');
+          container.innerHTML = "";
+          data.forEach(book => {
+            // Determine purpose and price display based on status
+            let purpose = "";
+            let priceInfo = "";
+            if (book.status.toLowerCase().includes('sell')) {
+              purpose = "For Sale";
+              priceInfo = `<p><strong>Price:</strong> $${book.sell_price}</p>`;
+            } else if (book.status.toLowerCase().includes('auction')) {
+              purpose = "For Auction";
+              priceInfo = `<p><strong>Max Bid:</strong> $${book.max_bid}</p>`;
+            }
+            
+            // Build the card element using template literals
+            const card = document.createElement('div');
+            card.classList.add('book-card');
+            card.innerHTML = `
+              <img src="/uploads/book_covers/${book.book_cover || 'default-cover.png'}" alt="Cover" class="cover-img">
+              <h3>${book.book_name}</h3>
+              <p><strong>Author:</strong> ${book.author}</p>
+              <p><strong>Edition:</strong> ${book.edition || 'N/A'}</p>
+              <p><strong>Uploader:</strong> ${book.uploader_name || 'N/A'}</p>
+              <p><strong>Purpose:</strong> ${purpose}</p>
+              ${priceInfo}
+            `;
+            
+            // For auction books, append a countdown element and start the countdown timer
+            if (purpose === "For Auction" && book.bid_end) {
+              const countdownEl = document.createElement('p');
+              countdownEl.classList.add('countdown');
+              countdownEl.id = `countdown_${book.id}`;
+              countdownEl.textContent = "Calculating time left...";
+              card.appendChild(countdownEl);
+              startCardCountdown(book.id, book.bid_end, card);
+            }
+            
+            // Create the red remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.classList.add('action-btn', 'remove-btn');
+            removeBtn.innerText = "Remove";
+            removeBtn.onclick = () => removeBook(book.id, card);
+            card.appendChild(removeBtn);
+            
+            // Append the card to the container
+            container.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error fetching books:', err));
+    });
+  </script>
+</body>
+</html>
